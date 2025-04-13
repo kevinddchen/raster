@@ -9,13 +9,11 @@
 int main()
 {
     // create a triangle at the origin, in the xz-plane
-    const Eigen::Vector3d v1{0.0, 0.0, 0.5};
-    const Eigen::Vector3d v2{0.5, 0.0, -0.5};
-    const Eigen::Vector3d v3{-0.5, 0.0, -0.5};
+    raster::Face face(
+        Eigen::Vector3d{0.0, 0.0, 0.5}, Eigen::Vector3d{0.5, 0.0, -0.5}, Eigen::Vector3d{-0.5, 0.0, -0.5});
 
     raster::Scene scene;
-    scene.triangles.push_back({v1, v2, v3});
-    // TODO: avoid copy
+    scene.faces.push_back(std::move(face));
 
     // create a camera looking at the triangle
     // camera is on the y-axis looking at the origin.

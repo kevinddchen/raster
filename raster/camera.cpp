@@ -67,12 +67,12 @@ Camera::Camera(int height, int width, double horizontal_fov, const Eigen::Affine
 void Camera::render(const Scene& scene) const
 {
     Eigen::MatrixXi screen = Eigen::MatrixXi::Zero(height, width);
-    for (auto& triangle : scene.triangles) {
+    for (const auto& face : scene.faces) {
         // project triangle points to image plane
         const Eigen::Affine3d world_to_camera = pose.inverse();
-        const Eigen::Vector2d v1 = project_point(world_to_camera * triangle[0]);
-        const Eigen::Vector2d v2 = project_point(world_to_camera * triangle[1]);
-        const Eigen::Vector2d v3 = project_point(world_to_camera * triangle[2]);
+        const Eigen::Vector2d v1 = project_point(world_to_camera * face.v1);
+        const Eigen::Vector2d v2 = project_point(world_to_camera * face.v2);
+        const Eigen::Vector2d v3 = project_point(world_to_camera * face.v3);
 
         // rasterize
         for (int row = 0; row < screen.rows(); ++row) {
