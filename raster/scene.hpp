@@ -10,6 +10,9 @@ namespace raster
 
 /**
  * A scene consists of a collection of mesh faces.
+ *
+ * We use the following coordinate conventions:
+ * - up is the +z direction
  */
 class Scene
 {

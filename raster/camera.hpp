@@ -12,14 +12,19 @@ namespace raster
 /**
  * Camera class.
  *
- * Note that we use camera space conventions where the x-axis points right and y-axis points down, so the z-axis points
- * forwards.
+ * We use the following camera coordinate conventions:
+ * - forward is the +z direction
+ * - up is the -y direction
+ * - right is the +x direction
+ *
+ * If a pose consists of a rotation `rot` and translation `trans`, then the camera-to-world transformation on a vector
+ * is `world = rot * camera + trans`.
  */
 class Camera
 {
 public:
     /**
-     * Create new camera.
+     * Create new perspetive camera.
      * @param height Image height, in pixels.
      * @param width Image width, in pixels.
      * @param horizontal_fov Horizontal field of view, in radians.
@@ -34,7 +39,8 @@ public:
 
     WINDOW* const window;
 
-    const Eigen::Affine3d pose;
+    const Eigen::Affine3d camera_to_world;
+    const Eigen::Affine3d world_to_camera;
 
     const int width;
     const int height;

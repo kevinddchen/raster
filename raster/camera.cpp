@@ -37,7 +37,8 @@ namespace raster
 
 Camera::Camera(int height, int width, double horizontal_fov, const Eigen::Affine3d& pose)
     : window(newwin(height, width, 0, 0)),
-      pose(pose),
+      camera_to_world(pose),
+      world_to_camera(pose.inverse()),
       width(width),
       height(height),
       cx(width / 2.0),
@@ -56,7 +57,6 @@ void Camera::render(const Scene& scene) const
 
     for (const auto& face : scene.mesh) {
         // project triangle points to image plane
-        const Eigen::Affine3d world_to_camera = pose.inverse();
         const Eigen::Vector2d v1 = project_point(world_to_camera * face.v1());
         const Eigen::Vector2d v2 = project_point(world_to_camera * face.v2());
         const Eigen::Vector2d v3 = project_point(world_to_camera * face.v3());

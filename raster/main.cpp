@@ -22,9 +22,9 @@ int main()
 
     // create a camera looking at the triangle
     // camera is on the y-axis looking at the origin.
-    // camera right = world -x axis
-    // camera up = world +z axis
-    // camera forward = world -y axis
+    // camera +x = world -x
+    // camera +y = world -z
+    // camera +z = world -y
     const Eigen::Matrix3d rot{{-1, 0, 0}, {0, 0, -1}, {0, -1, 0}};
     const Eigen::Vector3d trans{0, 1, 0};
     Eigen::Affine3d pose;
