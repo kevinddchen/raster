@@ -13,7 +13,7 @@ int main()
         Eigen::Vector3d{0.0, 0.0, 0.5}, Eigen::Vector3d{0.5, 0.0, -0.5}, Eigen::Vector3d{-0.5, 0.0, -0.5});
 
     raster::Scene scene;
-    scene.faces.push_back(std::move(face));
+    scene.mesh.push_back(std::move(face));
 
     // create a camera looking at the triangle
     // camera is on the y-axis looking at the origin.

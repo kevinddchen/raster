@@ -67,7 +67,7 @@ Camera::Camera(int height, int width, double horizontal_fov, const Eigen::Affine
 void Camera::render(const Scene& scene) const
 {
     Eigen::MatrixXi screen = Eigen::MatrixXi::Zero(height, width);
-    for (const auto& face : scene.faces) {
+    for (const auto& face : scene.mesh) {
         // project triangle points to image plane
         const Eigen::Affine3d world_to_camera = pose.inverse();
         const Eigen::Vector2d v1 = project_point(world_to_camera * face.v1());
