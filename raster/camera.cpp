@@ -29,24 +29,6 @@ bool point_in_triangle(
     return ((c1 > 0 && c2 > 0 && c3 > 0) || (c1 < 0 && c2 < 0 && c3 < 0));
 }
 
-/**
- * Debug print to console.
- */
-void print(const Eigen::MatrixXi& screen)
-{
-    for (int row = 0; row < screen.rows(); ++row) {
-        for (int col = 0; col < screen.cols(); ++col) {
-            if (screen(row, col) > 0) {
-                printf("X");
-            } else {
-                printf(" ");
-            }
-        }
-        printf("\n");
-    }
-}
-
-
 }  // namespace
 
 
@@ -54,7 +36,8 @@ namespace raster
 {
 
 Camera::Camera(int height, int width, double horizontal_fov, const Eigen::Affine3d& pose)
-    : pose(pose),
+    : window(newwin(height, width, 0, 0)),
+      pose(pose),
       width(width),
       height(height),
       cx(width / 2.0),
@@ -66,7 +49,11 @@ Camera::Camera(int height, int width, double horizontal_fov, const Eigen::Affine
 
 void Camera::render(const Scene& scene) const
 {
-    Eigen::MatrixXi screen = Eigen::MatrixXi::Zero(height, width);
+    werase(window);
+
+    // create border
+    box(window, 0, 0);
+
     for (const auto& face : scene.mesh) {
         // project triangle points to image plane
         const Eigen::Affine3d world_to_camera = pose.inverse();
@@ -75,20 +62,20 @@ void Camera::render(const Scene& scene) const
         const Eigen::Vector2d v3 = project_point(world_to_camera * face.v3());
 
         // rasterize
-        for (int row = 0; row < screen.rows(); ++row) {
-            for (int col = 0; col < screen.cols(); ++col) {
+        for (int row = 0; row < height; ++row) {
+            for (int col = 0; col < width; ++col) {
                 // get image plane coordinates for the pixel
                 const double u = (col - cx + 0.5) / fx;
                 const double v = (row - cy + 0.5) / fy;
                 const Eigen::Vector2d pt{u, v};
                 if (point_in_triangle(pt, v1, v2, v3)) {
-                    screen(row, col) = 1;
+                    mvwaddch(window, row, col, 'X');
                 }
             }
         }
     }
 
-    print(screen);
+    wnoutrefresh(window);
 }
 
 }  // namespace raster

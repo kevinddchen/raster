@@ -2,6 +2,7 @@
 
 #include <raster/scene.hpp>
 
+#include <ncurses.h>
 #include <Eigen/Dense>
 
 
@@ -30,6 +31,8 @@ public:
      * Render the scene.
      */
     void render(const Scene& scene) const;
+
+    WINDOW* const window;
 
     const Eigen::Affine3d pose;
 

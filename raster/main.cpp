@@ -1,4 +1,5 @@
 #include <raster/camera.hpp>
+#include <raster/ncurses.hpp>
 #include <raster/scene.hpp>
 
 #include <Eigen/Dense>
@@ -8,6 +9,10 @@
 
 int main()
 {
+    raster::init_ncurses();
+
+    // -----------------------------------------------------------------------
+
     // create a triangle at the origin, in the xz-plane
     raster::Face face(
         Eigen::Vector3d{0.0, 0.0, 0.5}, Eigen::Vector3d{0.5, 0.0, -0.5}, Eigen::Vector3d{-0.5, 0.0, -0.5});
@@ -31,5 +36,12 @@ int main()
     // render!
     camera.render(scene);
 
+    // -----------------------------------------------------------------------
+
+    doupdate();
+
+    wgetch(camera.window);
+
+    raster::end_ncurses();
     return EXIT_SUCCESS;
 }
