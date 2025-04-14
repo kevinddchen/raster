@@ -35,13 +35,23 @@ public:
      */
     Face(Face&& face) : _v1(std::move(face._v1)), _v2(std::move(face._v2)), _v3(std::move(face._v3)) {};
 
-    inline const Eigen::Vector3d& v1() const { return _v1; };
-    inline const Eigen::Vector3d& v2() const { return _v2; };
-    inline const Eigen::Vector3d& v3() const { return _v3; };
+    /**
+     * Apply rotation to all vertices.
+     */
+    inline void rotate(const Eigen::Matrix3d& rot)
+    {
+        _v1 = rot * _v1;
+        _v2 = rot * _v2;
+        _v3 = rot * _v3;
+    }
 
-    inline Eigen::Vector3d& mut_v1() { return _v1; };
-    inline Eigen::Vector3d& mut_v2() { return _v2; };
-    inline Eigen::Vector3d& mut_v3() { return _v3; };
+    inline const Eigen::Vector3d& v1() const { return _v1; }
+    inline const Eigen::Vector3d& v2() const { return _v2; }
+    inline const Eigen::Vector3d& v3() const { return _v3; }
+
+    inline Eigen::Vector3d& mut_v1() { return _v1; }
+    inline Eigen::Vector3d& mut_v2() { return _v2; }
+    inline Eigen::Vector3d& mut_v3() { return _v3; }
 
 private:
     Eigen::Vector3d _v1;

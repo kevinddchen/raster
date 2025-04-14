@@ -19,6 +19,16 @@ class Scene
 public:
     Scene() {};
 
+    /**
+     * Apply rotation to all mesh faces.
+     */
+    inline void rotate(const Eigen::Matrix3d& rot)
+    {
+        for (auto& face : mesh) {
+            face.rotate(rot);
+        }
+    }
+
     std::vector<Face> mesh;
 };
 
