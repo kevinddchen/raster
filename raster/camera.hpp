@@ -30,7 +30,7 @@ public:
      * @param horizontal_fov Horizontal field of view, in radians.
      * @param pose Camera-to-world pose.
      */
-    Camera(int height, int width, double horizontal_fov, const Eigen::Affine3d& pose);
+    Camera(int height, int width, float horizontal_fov, const Eigen::Affine3f& pose);
 
     /**
      * Render the scene.
@@ -39,15 +39,15 @@ public:
 
     WINDOW* const window;
 
-    const Eigen::Affine3d camera_to_world;
-    const Eigen::Affine3d world_to_camera;
+    const Eigen::Affine3f camera_to_world;
+    const Eigen::Affine3f world_to_camera;
 
     const int width;
     const int height;
-    const double cx;
-    const double cy;
-    const double fx;
-    const double fy;
+    const float cx;
+    const float cy;
+    const float fx;
+    const float fy;
 };
 
 }  // namespace raster

@@ -23,9 +23,9 @@ int main()
 
     // create a triangle at the origin, in the xz-plane
     raster::Face face(
-        Eigen::Vector3d{0.0, 0.0, 0.5},
-        Eigen::Vector3d{0.5, 0.0, -0.5},
-        Eigen::Vector3d{-0.5, 0.0, -0.5},
+        Eigen::Vector3f{0.0, 0.0, 0.5},
+        Eigen::Vector3f{0.5, 0.0, -0.5},
+        Eigen::Vector3f{-0.5, 0.0, -0.5},
         raster::COLOR_PAIR_RED);
 
     raster::Scene scene;
@@ -36,9 +36,9 @@ int main()
     // camera +x = world -x
     // camera +y = world -z
     // camera +z = world -y
-    const Eigen::Matrix3d rot{{-1, 0, 0}, {0, 0, -1}, {0, -1, 0}};
-    const Eigen::Vector3d trans{0, 1, 0};
-    Eigen::Affine3d pose;
+    const Eigen::Matrix3f rot{{-1, 0, 0}, {0, 0, -1}, {0, -1, 0}};
+    const Eigen::Vector3f trans{0, 1, 0};
+    Eigen::Affine3f pose;
     pose.linear() = rot;
     pose.translation() = trans;
 
@@ -55,7 +55,7 @@ int main()
     for (long iframe = 1;; ++iframe) {
         const auto t_frame = now();
 
-        const Eigen::Matrix3d rot(Eigen::AngleAxisd(ROTATION_PER_SEC / FRAMES_PER_SEC, Eigen::Vector3d::UnitZ()));
+        const Eigen::Matrix3f rot(Eigen::AngleAxisd(ROTATION_PER_SEC / FRAMES_PER_SEC, Eigen::Vector3f::UnitZ()));
         scene.rotate(rot);
 
         camera.render(scene);

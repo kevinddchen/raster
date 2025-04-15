@@ -7,7 +7,7 @@ namespace
 /**
  * Project a point from camera space to the image plane.
  */
-Eigen::Vector2d project_point(const Eigen::Vector3d& point)
+Eigen::Vector2f project_point(const Eigen::Vector3f& point)
 {
     assert(point.z() > 0);
     return {point.x() / point.z(), point.y() / point.z()};
@@ -18,13 +18,13 @@ Eigen::Vector2d project_point(const Eigen::Vector3d& point)
  * of the triangle or on an edge or vertex of the triangle.
  */
 bool point_in_triangle(
-    const Eigen::Vector2d& pt, const Eigen::Vector2d& v1, const Eigen::Vector2d& v2, const Eigen::Vector2d& v3)
+    const Eigen::Vector2f& pt, const Eigen::Vector2f& v1, const Eigen::Vector2f& v2, const Eigen::Vector2f& v3)
 {
     // Implementation: draw lines from point to each vertex. If we compute the cross product between each pair of lines,
     // going in-order around the triangle, the point is inside the triangle iff all cross products have the same sign.
-    const double c1 = (v1.x() - pt.x()) * (v2.y() - pt.y()) - (v1.y() - pt.y()) * (v2.x() - pt.x());
-    const double c2 = (v2.x() - pt.x()) * (v3.y() - pt.y()) - (v2.y() - pt.y()) * (v3.x() - pt.x());
-    const double c3 = (v3.x() - pt.x()) * (v1.y() - pt.y()) - (v3.y() - pt.y()) * (v1.x() - pt.x());
+    const float c1 = (v1.x() - pt.x()) * (v2.y() - pt.y()) - (v1.y() - pt.y()) * (v2.x() - pt.x());
+    const float c2 = (v2.x() - pt.x()) * (v3.y() - pt.y()) - (v2.y() - pt.y()) * (v3.x() - pt.x());
+    const float c3 = (v3.x() - pt.x()) * (v1.y() - pt.y()) - (v3.y() - pt.y()) * (v1.x() - pt.x());
 
     return ((c1 > 0 && c2 > 0 && c3 > 0) || (c1 < 0 && c2 < 0 && c3 < 0));
 }
@@ -35,7 +35,7 @@ bool point_in_triangle(
 namespace raster
 {
 
-Camera::Camera(int height, int width, double horizontal_fov, const Eigen::Affine3d& pose)
+Camera::Camera(int height, int width, float horizontal_fov, const Eigen::Affine3f& pose)
     : window(newwin(height, width, 0, 0)),
       camera_to_world(pose),
       world_to_camera(pose.inverse()),
@@ -57,9 +57,9 @@ void Camera::render(const Scene& scene) const
 
     for (const auto& face : scene.mesh) {
         // project triangle points to image plane
-        const Eigen::Vector2d v1 = project_point(world_to_camera * face.v1());
-        const Eigen::Vector2d v2 = project_point(world_to_camera * face.v2());
-        const Eigen::Vector2d v3 = project_point(world_to_camera * face.v3());
+        const Eigen::Vector2f v1 = project_point(world_to_camera * face.v1());
+        const Eigen::Vector2f v2 = project_point(world_to_camera * face.v2());
+        const Eigen::Vector2f v3 = project_point(world_to_camera * face.v3());
 
         // select color
         const chtype attr = COLOR_PAIR(face.color());
@@ -69,9 +69,9 @@ void Camera::render(const Scene& scene) const
         for (int row = 0; row < height; ++row) {
             for (int col = 0; col < width; ++col) {
                 // get image plane coordinates for the pixel
-                const double u = (col - cx + 0.5) / fx;
-                const double v = (row - cy + 0.5) / fy;
-                const Eigen::Vector2d pt{u, v};
+                const float u = (col - cx + 0.5) / fx;
+                const float v = (row - cy + 0.5) / fy;
+                const Eigen::Vector2f pt{u, v};
                 if (point_in_triangle(pt, v1, v2, v3)) {
                     mvwaddch(window, row, col, 'X');
                 }

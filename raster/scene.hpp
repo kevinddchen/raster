@@ -22,7 +22,7 @@ public:
     /**
      * Apply rotation to all mesh faces.
      */
-    inline void rotate(const Eigen::Matrix3d& rot)
+    inline void rotate(const Eigen::Matrix3f& rot)
     {
         for (auto& face : mesh) {
             face.rotate(rot);
