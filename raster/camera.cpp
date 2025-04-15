@@ -61,6 +61,10 @@ void Camera::render(const Scene& scene) const
         const Eigen::Vector2d v2 = project_point(world_to_camera * face.v2());
         const Eigen::Vector2d v3 = project_point(world_to_camera * face.v3());
 
+        // select color
+        const chtype attr = COLOR_PAIR(face.color());
+        wattron(window, attr);
+
         // rasterize
         for (int row = 0; row < height; ++row) {
             for (int col = 0; col < width; ++col) {
@@ -73,6 +77,8 @@ void Camera::render(const Scene& scene) const
                 }
             }
         }
+
+        wattroff(window, attr);
     }
 
     wnoutrefresh(window);

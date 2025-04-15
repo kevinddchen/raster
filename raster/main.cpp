@@ -23,7 +23,10 @@ int main()
 
     // create a triangle at the origin, in the xz-plane
     raster::Face face(
-        Eigen::Vector3d{0.0, 0.0, 0.5}, Eigen::Vector3d{0.5, 0.0, -0.5}, Eigen::Vector3d{-0.5, 0.0, -0.5});
+        Eigen::Vector3d{0.0, 0.0, 0.5},
+        Eigen::Vector3d{0.5, 0.0, -0.5},
+        Eigen::Vector3d{-0.5, 0.0, -0.5},
+        raster::COLOR_PAIR_RED);
 
     raster::Scene scene;
     scene.mesh.push_back(std::move(face));
