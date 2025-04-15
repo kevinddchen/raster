@@ -55,7 +55,7 @@ int main()
     for (long iframe = 1;; ++iframe) {
         const auto t_frame = now();
 
-        const Eigen::Matrix3f rot(Eigen::AngleAxisd(ROTATION_PER_SEC / FRAMES_PER_SEC, Eigen::Vector3f::UnitZ()));
+        const Eigen::Matrix3f rot(Eigen::AngleAxisf(ROTATION_PER_SEC / FRAMES_PER_SEC, Eigen::Vector3f::UnitZ()));
         scene.rotate(rot);
 
         camera.render(scene);
