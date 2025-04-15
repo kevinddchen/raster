@@ -6,11 +6,17 @@ namespace
 
 /**
  * Project a point from camera space to the image plane.
+ * @param point Input 3D point, in camera coordinates.
+ * @param out Reference to output 2D point, in image plane.
+ * @returns False if the point cannot be projected into the image plane.
  */
-Eigen::Vector2f project_point(const Eigen::Vector3f& point)
+bool project_point(const Eigen::Vector3f& point, Eigen::Vector2f& out)
 {
-    assert(point.z() > 0);
-    return {point.x() / point.z(), point.y() / point.z()};
+    if (point.z() <= 0.f) {
+        return false;
+    }
+    out = {point.x() / point.z(), point.y() / point.z()};
+    return true;
 }
 
 /**
@@ -57,9 +63,12 @@ void Camera::render(const Scene& scene) const
 
     for (const auto& face : scene.mesh) {
         // project triangle points to image plane
-        const Eigen::Vector2f v1 = project_point(world_to_camera * face.v1());
-        const Eigen::Vector2f v2 = project_point(world_to_camera * face.v2());
-        const Eigen::Vector2f v3 = project_point(world_to_camera * face.v3());
+        Eigen::Vector2f v1, v2, v3;
+        if (!project_point(world_to_camera * face.v1(), v1) || !project_point(world_to_camera * face.v2(), v2) ||
+            !project_point(world_to_camera * face.v3(), v3)) {
+            // a portion of the triangle lies outside of the image plane
+            continue;
+        }
 
         // select color
         const chtype attr = COLOR_PAIR(face.color());

@@ -9,7 +9,7 @@ namespace raster
 {
 
 /**
- * Triangle mesh face.
+ * Triangle mesh face in 3D space.
  */
 class Face
 {
@@ -48,7 +48,7 @@ public:
           _color(face._color) {};
 
     /**
-     * Apply rotation to all vertices.
+     * Apply rotation to mesh face.
      */
     void rotate(const Eigen::Matrix3f& rot);
 
@@ -56,12 +56,7 @@ public:
     inline const Eigen::Vector3f& v2() const { return _v2; }
     inline const Eigen::Vector3f& v3() const { return _v3; }
 
-    inline Eigen::Vector3f& mut_v1() { return _v1; }
-    inline Eigen::Vector3f& mut_v2() { return _v2; }
-    inline Eigen::Vector3f& mut_v3() { return _v3; }
-
     inline short color() const { return _color; }
-    inline short& mut_color() { return _color; }
 
 private:
     Eigen::Vector3f _v1;
