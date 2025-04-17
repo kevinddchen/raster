@@ -31,7 +31,7 @@ struct BoundingBox {
 /**
  * Given a collection of 2D points, compute the bounding box. We round the box coordinates to integer values in a way
  * that makes the smallest box. This is because `points` is typically the vertices of a triangle, and we want a tight
- * box around points on and interior to the triangle.
+ * box around points on or inside the triangle.
  */
 BoundingBox get_bounding_box(const std::vector<const Eigen::Vector2f*>& points)
 {
@@ -64,20 +64,29 @@ BoundingBox get_bounding_box(const std::vector<const Eigen::Vector2f*>& points)
 }
 
 /**
- * Returns true if the point `pt` is inside the triangle with the given vertices. Returns false if the point is
- * outside of the triangle or on an edge or vertex of the triangle.
+ * Given line a --> b and point p on the 2D plane, returns:
+ * - positive value if p is on the right side of the line.
+ * - zero if p is on the line.
+ * - negative value if p is on the left side of the line.
+ */
+inline float edge_function(const Eigen::Vector2f& p, const Eigen::Vector2f& a, const Eigen::Vector2f& b)
+{
+    return (p.x() - a.x()) * (b.y() - a.y()) - (p.y() - a.y()) * (b.x() - a.x());
+}
+
+/**
+ * Returns true if the point `p` is on or inside the triangle with the given vertices.
+ *
+ * NOTE: Top-left rule has not been implemented.
  */
 bool point_in_triangle(
-    const Eigen::Vector2f& pt, const Eigen::Vector2f& v1, const Eigen::Vector2f& v2, const Eigen::Vector2f& v3)
+    const Eigen::Vector2f& p, const Eigen::Vector2f& v1, const Eigen::Vector2f& v2, const Eigen::Vector2f& v3)
 {
-    // Implementation: draw lines from point to each vertex. If we compute the cross product between each pair of
-    // lines, going in-order around the triangle, the point is inside the triangle iff all cross products have the
-    // same sign.
-    const float c1 = (v1.x() - pt.x()) * (v2.y() - pt.y()) - (v1.y() - pt.y()) * (v2.x() - pt.x());
-    const float c2 = (v2.x() - pt.x()) * (v3.y() - pt.y()) - (v2.y() - pt.y()) * (v3.x() - pt.x());
-    const float c3 = (v3.x() - pt.x()) * (v1.y() - pt.y()) - (v3.y() - pt.y()) * (v1.x() - pt.x());
+    const float edge_12 = edge_function(p, v1, v2);
+    const float edge_23 = edge_function(p, v2, v3);
+    const float edge_31 = edge_function(p, v3, v1);
 
-    return ((c1 > 0 && c2 > 0 && c3 > 0) || (c1 < 0 && c2 < 0 && c3 < 0));
+    return (edge_12 >= 0 && edge_23 >= 0 && edge_31 >= 0) || (edge_12 <= 0 && edge_23 <= 0 && edge_31 <= 0);
 }
 
 }  // namespace
