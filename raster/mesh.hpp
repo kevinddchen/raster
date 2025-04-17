@@ -18,34 +18,25 @@ public:
      * Constructor, by copying input vectors.
      */
     Face(
-        const Eigen::Vector3f& v1, const Eigen::Vector3f& v2, const Eigen::Vector3f& v3, short color = COLOR_PAIR_WHITE)
-        : _v1(v1),
-          _v2(v2),
-          _v3(v3),
-          _color(color) {};
+        const Eigen::Vector3f& v1,
+        const Eigen::Vector3f& v2,
+        const Eigen::Vector3f& v3,
+        short color = COLOR_PAIR_WHITE);
 
     /**
      * Constructor, by moving input vectors.
      */
-    Face(Eigen::Vector3f&& v1, Eigen::Vector3f&& v2, Eigen::Vector3f&& v3, short color = COLOR_PAIR_WHITE)
-        : _v1(v1),
-          _v2(v2),
-          _v3(v3),
-          _color(color) {};
+    Face(Eigen::Vector3f&& v1, Eigen::Vector3f&& v2, Eigen::Vector3f&& v3, short color = COLOR_PAIR_WHITE);
 
     /**
      * Copy constructor.
      */
-    Face(const Face& face) : _v1(face._v1), _v2(face._v2), _v3(face._v3), _color(face._color) {};
+    Face(const Face& face);
 
     /**
      * Move constructor.
      */
-    Face(Face&& face)
-        : _v1(std::move(face._v1)),
-          _v2(std::move(face._v2)),
-          _v3(std::move(face._v3)),
-          _color(face._color) {};
+    Face(Face&& face);
 
     /**
      * Apply rotation to mesh face.

@@ -13,18 +13,18 @@ namespace raster
  * Camera class.
  *
  * We use the following camera coordinate conventions:
- * - forward is the +z direction
- * - up is the -y direction
- * - right is the +x direction
+ * - "forward" is the +z direction.
+ * - "up" is the -y direction.
+ * - "right" is the +x direction.
  *
- * If a pose consists of a rotation `rot` and translation `trans`, then the camera-to-world transformation on a vector
- * is `world = rot * camera + trans`.
+ * A pose consists of a rotation `rot` and translation `trans`. Explicitly, the camera-to-world transformation is
+ * implemented as the affine transformation `rot * v + trans` where `v` is a vector in camera coordinates.
  */
 class Camera
 {
 public:
     /**
-     * Create new perspetive camera.
+     * Create new perspective camera.
      * @param height Image height, in pixels.
      * @param width Image width, in pixels.
      * @param horizontal_fov Horizontal field of view, in radians.
