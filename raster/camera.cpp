@@ -1,7 +1,5 @@
 #include <raster/camera.hpp>
 
-#include <vector>
-
 
 namespace
 {
@@ -29,32 +27,15 @@ struct BoundingBox {
 };
 
 /**
- * Given a collection of 2D points, compute the bounding box. We round the box coordinates to integer values in a way
- * that makes the smallest box. This is because `points` is typically the vertices of a triangle, and we want a tight
- * box around points on or inside the triangle.
+ * Given the vertices of a triangle on the 2D plane, compute the bounding box. We round the box coordinates to integer
+ * values in a way that makes the tightest box around the points interior to the triangle and on its edges.
  */
-BoundingBox get_bounding_box(const std::vector<const Eigen::Vector2f*>& points)
+BoundingBox get_bounding_box(const Eigen::Vector2f& v1, const Eigen::Vector2f& v2, const Eigen::Vector2f& v3)
 {
-    assert(points.size() > 0);
-    float min_x = points[0]->x();
-    float max_x = min_x;
-    float min_y = points[0]->y();
-    float max_y = min_y;
-
-    for (auto ptr = points.begin() + 1; ptr != points.end(); ++ptr) {
-        const float x = (*ptr)->x();
-        const float y = (*ptr)->y();
-        if (x < min_x) {
-            min_x = x;
-        } else if (x > max_x) {
-            max_x = x;
-        }
-        if (y < min_y) {
-            min_y = y;
-        } else if (y > max_y) {
-            max_y = y;
-        }
-    }
+    const float min_x = std::min(v1.x(), std::min(v2.x(), v3.x()));
+    const float max_x = std::max(v1.x(), std::max(v2.x(), v3.x()));
+    const float min_y = std::min(v1.y(), std::min(v2.y(), v3.y()));
+    const float max_y = std::max(v1.y(), std::max(v2.y(), v3.y()));
 
     return {
         .min_row = static_cast<int>(std::ceil(min_y)),
@@ -75,7 +56,7 @@ inline float edge_function(const Eigen::Vector2f& p, const Eigen::Vector2f& a, c
 }
 
 /**
- * Returns true if the point `p` is on or inside the triangle with the given vertices.
+ * Returns true if the point `p` is interior to the triangle with the given vertices, or on one of its edges.
  *
  * NOTE: Top-left rule has not been implemented.
  */
@@ -131,7 +112,7 @@ void Camera::render(const Scene& scene) const
         v3 = {fx * v3.x() + cx, fy * v3.y() + cy};
 
         // get bounding box
-        BoundingBox bbox = get_bounding_box({&v1, &v2, &v3});
+        BoundingBox bbox = get_bounding_box(v1, v2, v3);
 
         // select color
         const chtype attr = COLOR_PAIR(face.color());
