@@ -6,16 +6,16 @@ namespace
 
 /**
  * Project a 3D point from camera space to the image plane.
- * @param point Input 3D point, in camera coordinates.
- * @param out Reference to output 2D point, in image plane.
+ * @param v Input 3D point, in camera coordinates.
+ * @param p Reference to output 2D point, in image plane.
  * @returns False if the point cannot be projected into the image plane.
  */
-bool project_point(const Eigen::Vector3f& point, Eigen::Vector2f& out)
+bool project_point(const Eigen::Vector3f& v, Eigen::Vector2f& p)
 {
-    if (point.z() <= 0) {
+    if (v.z() <= 0) {
         return false;
     }
-    out = {point.x() / point.z(), point.y() / point.z()};
+    p = {v.x() / v.z(), v.y() / v.z()};
     return true;
 }
 
@@ -30,12 +30,12 @@ struct BoundingBox {
  * Given the vertices of a triangle on the 2D plane, compute the bounding box. We round the box coordinates to integer
  * values in a way that makes the tightest box around the points interior to the triangle and on its edges.
  */
-BoundingBox get_bounding_box(const Eigen::Vector2f& v1, const Eigen::Vector2f& v2, const Eigen::Vector2f& v3)
+BoundingBox get_bounding_box(const Eigen::Vector2f& p1, const Eigen::Vector2f& p2, const Eigen::Vector2f& p3)
 {
-    const float min_x = std::min(v1.x(), std::min(v2.x(), v3.x()));
-    const float max_x = std::max(v1.x(), std::max(v2.x(), v3.x()));
-    const float min_y = std::min(v1.y(), std::min(v2.y(), v3.y()));
-    const float max_y = std::max(v1.y(), std::max(v2.y(), v3.y()));
+    const float min_x = std::min(p1.x(), std::min(p2.x(), p3.x()));
+    const float max_x = std::max(p1.x(), std::max(p2.x(), p3.x()));
+    const float min_y = std::min(p1.y(), std::min(p2.y(), p3.y()));
+    const float max_y = std::max(p1.y(), std::max(p2.y(), p3.y()));
 
     return {
         .min_row = static_cast<int>(std::ceil(min_y)),
@@ -49,6 +49,8 @@ BoundingBox get_bounding_box(const Eigen::Vector2f& v1, const Eigen::Vector2f& v
  * - positive value if p is on the right side of the line.
  * - zero if p is on the line.
  * - negative value if p is on the left side of the line.
+ * The absolute value of the returned result is equal to twice the area of the triangle with vertices at the three
+ * points, a b and p. In other words, this function computes the cross product between a --> p and a --> b.
  */
 inline float edge_function(const Eigen::Vector2f& p, const Eigen::Vector2f& a, const Eigen::Vector2f& b)
 {
@@ -56,16 +58,34 @@ inline float edge_function(const Eigen::Vector2f& p, const Eigen::Vector2f& a, c
 }
 
 /**
- * Returns true if the point `p` is interior to the triangle with the given vertices, or on one of its edges.
+ * Returns true if the point `q` is interior to the triangle with the given vertices, or on one of its edges.
+ * @param q Query point.
+ * @param p1 Triangle vertex.
+ * @param p2 Triangle vertex.
+ * @param p3 Triangle vertex.
+ * @param b1 Will be set to the barycentric coordinate of `q` relative to `p1`.
+ * @param b2 Will be set to the barycentric coordinate of `q` relative to `p2`.
+ * @param b3 Will be set to the barycentric coordinate of `q` relative to `p3`.
  *
  * NOTE: Top-left rule has not been implemented.
  */
 bool point_in_triangle(
-    const Eigen::Vector2f& p, const Eigen::Vector2f& v1, const Eigen::Vector2f& v2, const Eigen::Vector2f& v3)
+    const Eigen::Vector2f& q,
+    const Eigen::Vector2f& p1,
+    const Eigen::Vector2f& p2,
+    const Eigen::Vector2f& p3,
+    float& b1,
+    float& b2,
+    float& b3)
 {
-    const float edge_12 = edge_function(p, v1, v2);
-    const float edge_23 = edge_function(p, v2, v3);
-    const float edge_31 = edge_function(p, v3, v1);
+    const float edge_12 = edge_function(q, p1, p2);
+    const float edge_23 = edge_function(q, p2, p3);
+    const float edge_31 = edge_function(q, p3, p1);
+
+    const float area = edge_function(p1, p2, p3);
+    b1 = std::abs(edge_23 / area);
+    b2 = std::abs(edge_31 / area);
+    b3 = std::abs(edge_12 / area);
 
     return (edge_12 >= 0 && edge_23 >= 0 && edge_31 >= 0) || (edge_12 <= 0 && edge_23 <= 0 && edge_31 <= 0);
 }
@@ -98,21 +118,20 @@ void Camera::render(const Scene& scene) const
 
     for (const auto& face : scene.mesh) {
         // project triangle points to image plane
-        Eigen::Vector2f v1, v2, v3;
-        if (!project_point(world_to_camera * face.v1(), v1) || !project_point(world_to_camera * face.v2(), v2) ||
-            !project_point(world_to_camera * face.v3(), v3)) {
+        Eigen::Vector2f p1, p2, p3;
+        if (!project_point(world_to_camera * face.v1(), p1) || !project_point(world_to_camera * face.v2(), p2) ||
+            !project_point(world_to_camera * face.v3(), p3)) {
             // skip if a portion of the triangle lies outside of the image plane
-            // TODO: we can still draw part of the triangle... maybe this is related to overlapping triangles...
             continue;
         }
 
         // convert from normalized coords to pixel coords
-        v1 = {fx * v1.x() + cx, fy * v1.y() + cy};
-        v2 = {fx * v2.x() + cx, fy * v2.y() + cy};
-        v3 = {fx * v3.x() + cx, fy * v3.y() + cy};
+        const Eigen::Vector2f pix1 = {fx * p1.x() + cx, fy * p1.y() + cy};
+        const Eigen::Vector2f pix2 = {fx * p2.x() + cx, fy * p2.y() + cy};
+        const Eigen::Vector2f pix3 = {fx * p3.x() + cx, fy * p3.y() + cy};
 
         // get bounding box
-        BoundingBox bbox = get_bounding_box(v1, v2, v3);
+        const BoundingBox bbox = get_bounding_box(pix1, pix2, pix3);
 
         // select color
         const chtype attr = COLOR_PAIR(face.color());
@@ -122,8 +141,9 @@ void Camera::render(const Scene& scene) const
         for (int row = bbox.min_row; row <= bbox.max_row; ++row) {
             for (int col = bbox.min_col; col <= bbox.max_col; ++col) {
                 // get image plane coordinates for the pixel
-                const Eigen::Vector2f pt{col, row};
-                if (point_in_triangle(pt, v1, v2, v3)) {
+                const Eigen::Vector2f pixq{col, row};
+                float b1, b2, b3;
+                if (point_in_triangle(pixq, pix1, pix2, pix3, b1, b2, b3)) {
                     mvwaddch(window, row, col, 'X');
                 }
             }
