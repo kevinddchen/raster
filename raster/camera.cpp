@@ -6,6 +6,7 @@ namespace
 
 /**
  * Project a 3D point from camera space to the image plane.
+ *
  * @param v Input 3D point, in camera coordinates.
  * @param p Reference to output 2D point, in image plane.
  * @returns False if the point cannot be projected into the image plane.
@@ -45,12 +46,12 @@ BoundingBox get_bounding_box(const Eigen::Vector2f& p1, const Eigen::Vector2f& p
 }
 
 /**
- * Given line a --> b and point p on the 2D plane, returns:
+ * Given line a -> b and point p on the 2D plane, returns:
  * - positive value if p is on the right side of the line.
  * - zero if p is on the line.
  * - negative value if p is on the left side of the line.
  * The absolute value of the returned result is equal to twice the area of the triangle with vertices at the three
- * points, a b and p. In other words, this function computes the cross product between a --> p and a --> b.
+ * points, a b and p. In other words, this function computes the cross product between a -> p and a -> b.
  */
 inline float edge_function(const Eigen::Vector2f& p, const Eigen::Vector2f& a, const Eigen::Vector2f& b)
 {
@@ -58,7 +59,9 @@ inline float edge_function(const Eigen::Vector2f& p, const Eigen::Vector2f& a, c
 }
 
 /**
- * Returns true if the point `q` is interior to the triangle with the given vertices, or on one of its edges.
+ * Returns true if the point `q` is interior to the triangle with the given vertices, or on one of its edges. Also
+ * computes the barycentric coordinates of `q`.
+ *
  * @param q Query point.
  * @param p1 Triangle vertex.
  * @param p2 Triangle vertex.
@@ -82,10 +85,10 @@ bool point_in_triangle(
     const float edge_23 = edge_function(q, p2, p3);
     const float edge_31 = edge_function(q, p3, p1);
 
-    const float area = edge_function(p1, p2, p3);
-    b1 = std::abs(edge_23 / area);
-    b2 = std::abs(edge_31 / area);
-    b3 = std::abs(edge_12 / area);
+    const float signed_area = edge_function(p1, p2, p3);
+    b1 = std::abs(edge_23 / signed_area);
+    b2 = std::abs(edge_31 / signed_area);
+    b3 = std::abs(edge_12 / signed_area);
 
     return (edge_12 >= 0 && edge_23 >= 0 && edge_31 >= 0) || (edge_12 <= 0 && edge_23 <= 0 && edge_31 <= 0);
 }
@@ -116,11 +119,17 @@ void Camera::render(const Scene& scene) const
     // draw border
     box(window, 0, 0);
 
+    // initialize z-buffer
+    Eigen::ArrayXXf z_buf = Eigen::ArrayXXf::Constant(height, width, -1.0);
+
     for (const auto& face : scene.mesh) {
+        // get triangle points in camera space
+        const Eigen::Vector3f v1 = world_to_camera * face.v1();
+        const Eigen::Vector3f v2 = world_to_camera * face.v2();
+        const Eigen::Vector3f v3 = world_to_camera * face.v3();
         // project triangle points to image plane
         Eigen::Vector2f p1, p2, p3;
-        if (!project_point(world_to_camera * face.v1(), p1) || !project_point(world_to_camera * face.v2(), p2) ||
-            !project_point(world_to_camera * face.v3(), p3)) {
+        if (!project_point(v1, p1) || !project_point(v2, p2) || !project_point(v3, p3)) {
             // skip if a portion of the triangle lies outside of the image plane
             continue;
         }
@@ -143,7 +152,14 @@ void Camera::render(const Scene& scene) const
                 // get image plane coordinates for the pixel
                 const Eigen::Vector2f pixq{col, row};
                 float b1, b2, b3;
-                if (point_in_triangle(pixq, pix1, pix2, pix3, b1, b2, b3)) {
+                if (!point_in_triangle(pixq, pix1, pix2, pix3, b1, b2, b3)) {
+                    continue;
+                }
+                // compute z for the pixel, and compare to z-buffer
+                const float z = 1 / (b1 / v1.z() + b2 / v2.z() + b3 / v3.z());
+                if (float prev_z = z_buf(row, col); prev_z < 0 || z < prev_z) {
+                    // update z-buffer and render pixel
+                    z_buf(row, col) = z;
                     mvwaddch(window, row, col, 'X');
                 }
             }

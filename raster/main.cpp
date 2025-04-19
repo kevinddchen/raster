@@ -21,15 +21,23 @@ int main()
 
     // -----------------------------------------------------------------------
 
-    // create a triangle at the origin, in the xz-plane
-    raster::Face face(
+    // world "up" is the +z axis
+    // create a red triangle at the origin, in the xz-plane
+    raster::Face red_triangle(
         Eigen::Vector3f{0.0, 0.0, 0.5},
         Eigen::Vector3f{0.5, 0.0, -0.5},
         Eigen::Vector3f{-0.5, 0.0, -0.5},
         raster::COLOR_PAIR_RED);
+    // create a green triangle at the origin, in the yz-plane
+    raster::Face green_triangle(
+        Eigen::Vector3f{0.0, 0.0, 0.5},
+        Eigen::Vector3f{0.0, 0.5, -0.5},
+        Eigen::Vector3f{0.0, -0.5, -0.5},
+        raster::COLOR_PAIR_GREEN);
 
     raster::Scene scene;
-    scene.mesh.push_back(std::move(face));
+    scene.mesh.push_back(std::move(red_triangle));
+    scene.mesh.push_back(std::move(green_triangle));
 
     // create a camera looking at the triangle
     // camera is on the y-axis looking at the origin.
