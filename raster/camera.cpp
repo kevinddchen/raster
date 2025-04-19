@@ -127,6 +127,7 @@ void Camera::render(const Scene& scene) const
         const Eigen::Vector3f v1 = world_to_camera * face.v1();
         const Eigen::Vector3f v2 = world_to_camera * face.v2();
         const Eigen::Vector3f v3 = world_to_camera * face.v3();
+
         // project triangle points to image plane
         Eigen::Vector2f p1, p2, p3;
         if (!project_point(v1, p1) || !project_point(v2, p2) || !project_point(v3, p3)) {
@@ -146,7 +147,7 @@ void Camera::render(const Scene& scene) const
         const chtype attr = COLOR_PAIR(face.color());
         wattron(window, attr);
 
-        // rasterize
+        // rasterize mesh face
         for (int row = bbox.min_row; row <= bbox.max_row; ++row) {
             for (int col = bbox.min_col; col <= bbox.max_col; ++col) {
                 // get image plane coordinates for the pixel
@@ -155,7 +156,8 @@ void Camera::render(const Scene& scene) const
                 if (!point_in_triangle(pixq, pix1, pix2, pix3, b1, b2, b3)) {
                     continue;
                 }
-                // compute z for the pixel, and compare to z-buffer
+                // compute z for the corresponding point on the triangle in camera space. recall that due to projection,
+                // the value of 1/z is linearly interpolated in the image plane by barycentric coords
                 const float z = 1 / (b1 / v1.z() + b2 / v2.z() + b3 / v3.z());
                 if (float prev_z = z_buf(row, col); prev_z < 0 || z < prev_z) {
                     // update z-buffer and render pixel

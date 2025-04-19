@@ -9,7 +9,7 @@ namespace raster
 {
 
 /**
- * Triangle mesh face in 3D space.
+ * Triangle mesh face.
  */
 class Face
 {
@@ -50,6 +50,7 @@ public:
     inline short color() const { return _color; }
 
 private:
+    // NOTE: Vertices are in world coordinates.
     Eigen::Vector3f _v1;
     Eigen::Vector3f _v2;
     Eigen::Vector3f _v3;

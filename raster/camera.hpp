@@ -17,8 +17,8 @@ namespace raster
  * - "up" is the -y direction.
  * - "right" is the +x direction.
  *
- * A pose consists of a rotation `rot` and translation `trans`. Explicitly, the camera-to-world transformation is
- * implemented as the affine transformation `rot * v + trans` where `v` is a vector in camera coordinates.
+ * A pose consists of a rotation `rot` and translation `trans`. The camera-to-world transformation is implemented as an
+ * affine transformation on 3D vectors. Explicitly, it is `rot * v + trans` where `v` is a vector.
  */
 class Camera
 {
