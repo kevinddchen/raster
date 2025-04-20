@@ -72,10 +72,13 @@ public:
     /**
      * Iterator over faces of the mesh.
      */
-    template <class TFace, class TMesh>
+    template <bool is_const>
     struct Iterator {
         using difference_type = std::ptrdiff_t;
-        using value_type = TFace;
+        using value_type = Face;
+
+        using TFace = typename std::conditional_t<is_const, const Face, Face>;
+        using TMesh = typename std::conditional_t<is_const, const Mesh, Mesh>;
 
         Iterator() = default;
         Iterator(TMesh* ptr, size_t idx) : ptr(ptr), idx(idx) {}
@@ -101,12 +104,13 @@ public:
         TMesh* ptr;
         size_t idx;
     };
-    static_assert(std::forward_iterator<Iterator<Face, Mesh>>);
+    static_assert(std::forward_iterator<Iterator<false>>);
+    static_assert(std::forward_iterator<Iterator<true>>);
 
-    Iterator<Face, Mesh> begin() { return Iterator<Face, Mesh>(this, 0); }
-    Iterator<Face, Mesh> end() { return Iterator<Face, Mesh>(this, faces.size()); }
-    Iterator<const Face, const Mesh> cbegin() const { return Iterator<const Face, const Mesh>(this, 0); }
-    Iterator<const Face, const Mesh> cend() const { return Iterator<const Face, const Mesh>(this, faces.size()); }
+    Iterator<false> begin() { return Iterator<false>(this, 0); }
+    Iterator<false> end() { return Iterator<false>(this, faces.size()); }
+    Iterator<true> cbegin() const { return Iterator<true>(this, 0); }
+    Iterator<true> cend() const { return Iterator<true>(this, faces.size()); }
 
 private:
     // NOTE: Internal data structure to be changed...
