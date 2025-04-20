@@ -112,7 +112,7 @@ Camera::Camera(int height, int width, float horizontal_fov, const Eigen::Affine3
 {
 }
 
-void Camera::render(const Scene& scene) const
+void Camera::render(const Mesh& mesh) const
 {
     werase(window);
 
@@ -122,7 +122,9 @@ void Camera::render(const Scene& scene) const
     // initialize z-buffer
     Eigen::ArrayXXf z_buf = Eigen::ArrayXXf::Constant(height, width, -1.0);
 
-    for (const auto& face : scene.mesh) {
+    for (auto ptr = mesh.cbegin(); ptr != mesh.cend(); ++ptr) {
+        const auto& face = *ptr;
+
         // get triangle points in camera space
         const Eigen::Vector3f v1 = world_to_camera * face.v1();
         const Eigen::Vector3f v2 = world_to_camera * face.v2();

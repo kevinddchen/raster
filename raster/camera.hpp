@@ -1,6 +1,6 @@
 #pragma once
 
-#include <raster/scene.hpp>
+#include <raster/mesh.hpp>
 
 #include <ncurses.h>
 #include <Eigen/Dense>
@@ -35,7 +35,7 @@ public:
     /**
      * Render the scene.
      */
-    void render(const Scene& scene) const;
+    void render(const Mesh& mesh) const;
 
     WINDOW* const window;
 

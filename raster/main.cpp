@@ -1,6 +1,5 @@
 #include <raster/camera.hpp>
 #include <raster/ncurses.hpp>
-#include <raster/scene.hpp>
 
 #include <Eigen/Dense>
 
@@ -13,6 +12,13 @@ constexpr double FRAMES_PER_SEC = 30;
 std::chrono::steady_clock::time_point now()
 {
     return std::chrono::steady_clock::now();
+}
+
+void rotate_mesh(raster::Mesh& mesh, const Eigen::Matrix3f& rot)
+{
+    for (auto ptr = mesh.begin(); ptr != mesh.end(); ++ptr) {
+        (*ptr).rotate(rot);
+    }
 }
 
 int main()
@@ -35,9 +41,11 @@ int main()
         Eigen::Vector3f{0.0, -0.5, -0.5},
         raster::COLOR_PAIR_GREEN);
 
-    raster::Scene scene;
-    scene.mesh.push_back(std::move(red_triangle));
-    scene.mesh.push_back(std::move(green_triangle));
+    std::vector<raster::Face> faces;
+    faces.push_back(std::move(red_triangle));
+    faces.push_back(std::move(green_triangle));
+
+    raster::Mesh mesh(std::move(faces));
 
     // create a camera looking at the triangle
     // camera is on the y-axis looking at the origin.
@@ -64,9 +72,9 @@ int main()
         const auto t_frame = now();
 
         const Eigen::Matrix3f rot(Eigen::AngleAxisf(ROTATION_PER_SEC / FRAMES_PER_SEC, Eigen::Vector3f::UnitZ()));
-        scene.rotate(rot);
+        rotate_mesh(mesh, rot);
 
-        camera.render(scene);
+        camera.render(mesh);
         doupdate();
 
         // wait until frame ends
@@ -75,10 +83,6 @@ int main()
     }
 
     // -----------------------------------------------------------------------
-
-    doupdate();
-
-    wgetch(camera.window);
 
     raster::end_ncurses();
     return EXIT_SUCCESS;
