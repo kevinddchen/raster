@@ -122,13 +122,13 @@ void Camera::render(const Mesh& mesh) const
     // initialize z-buffer
     Eigen::ArrayXXf z_buf = Eigen::ArrayXXf::Constant(height, width, -1.0);
 
-    for (auto ptr = mesh.cbegin(); ptr != mesh.cend(); ++ptr) {
+    for (auto ptr = mesh.begin(); ptr != mesh.end(); ++ptr) {
         const auto& face = *ptr;
 
         // get triangle points in camera space
-        const Eigen::Vector3f v1 = world_to_camera * face.v1();
-        const Eigen::Vector3f v2 = world_to_camera * face.v2();
-        const Eigen::Vector3f v3 = world_to_camera * face.v3();
+        const Eigen::Vector3f v1 = world_to_camera * face.v1;
+        const Eigen::Vector3f v2 = world_to_camera * face.v2;
+        const Eigen::Vector3f v3 = world_to_camera * face.v3;
 
         // project triangle points to image plane
         Eigen::Vector2f p1, p2, p3;
@@ -146,7 +146,7 @@ void Camera::render(const Mesh& mesh) const
         const BoundingBox bbox = get_bounding_box(pix1, pix2, pix3);
 
         // select color
-        const chtype attr = COLOR_PAIR(face.color());
+        const chtype attr = COLOR_PAIR(face.color);
         wattron(window, attr);
 
         // rasterize mesh face
