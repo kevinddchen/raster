@@ -14,13 +14,6 @@ std::chrono::steady_clock::time_point now()
     return std::chrono::steady_clock::now();
 }
 
-void rotate_mesh(raster::Mesh& mesh, const Eigen::Matrix3f& rot)
-{
-    for (auto ptr = mesh.begin(); ptr != mesh.end(); ++ptr) {
-        (*ptr).rotate(rot);
-    }
-}
-
 int main()
 {
     raster::init_ncurses();
@@ -28,24 +21,25 @@ int main()
     // -----------------------------------------------------------------------
 
     // world "up" is the +z axis
-    // create a red triangle at the origin, in the xz-plane
-    raster::Face red_triangle(
+    std::vector<Eigen::Vector3f> vertices = {
+        // create a red triangle at the origin, in the xz-plane
         Eigen::Vector3f{0.0, 0.0, 0.5},
         Eigen::Vector3f{0.5, 0.0, -0.5},
         Eigen::Vector3f{-0.5, 0.0, -0.5},
-        raster::COLOR_PAIR_RED);
-    // create a green triangle at the origin, in the yz-plane
-    raster::Face green_triangle(
+        // create a green triangle at the origin, in the yz-plane
         Eigen::Vector3f{0.0, 0.0, 0.5},
         Eigen::Vector3f{0.0, 0.5, -0.5},
         Eigen::Vector3f{0.0, -0.5, -0.5},
-        raster::COLOR_PAIR_GREEN);
+    };
 
-    std::vector<raster::Face> faces;
-    faces.push_back(std::move(red_triangle));
-    faces.push_back(std::move(green_triangle));
+    std::vector<Eigen::Vector3i> face_vertex_indices = {
+        Eigen::Vector3i{0, 1, 2},
+        Eigen::Vector3i{3, 4, 5},
+    };
 
-    raster::Mesh mesh(std::move(faces));
+    std::vector<short> colors = {raster::COLOR_PAIR_RED, raster::COLOR_PAIR_GREEN};
+
+    raster::Mesh mesh(std::move(vertices), std::move(face_vertex_indices), std::move(colors));
 
     // create a camera looking at the triangle
     // camera is on the y-axis looking at the origin.
@@ -71,8 +65,8 @@ int main()
     for (long iframe = 1;; ++iframe) {
         const auto t_frame = now();
 
-        const Eigen::Matrix3f rot(Eigen::AngleAxisf(ROTATION_PER_SEC / FRAMES_PER_SEC, Eigen::Vector3f::UnitZ()));
-        rotate_mesh(mesh, rot);
+        Eigen::Affine3f rot(Eigen::AngleAxisf(ROTATION_PER_SEC / FRAMES_PER_SEC, Eigen::Vector3f::UnitZ()));
+        mesh.transform(rot);
 
         camera.render(mesh);
         doupdate();

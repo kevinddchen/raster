@@ -4,31 +4,34 @@
 namespace raster
 {
 
-Face::Face(const Eigen::Vector3f& v1, const Eigen::Vector3f& v2, const Eigen::Vector3f& v3, short color)
-    : _v1(v1),
-      _v2(v2),
-      _v3(v3),
-      _color(color) {};
-
-Face::Face(Eigen::Vector3f&& v1, Eigen::Vector3f&& v2, Eigen::Vector3f&& v3, short color)
-    : _v1(v1),
-      _v2(v2),
-      _v3(v3),
-      _color(color) {};
-
-Face::Face(const Face& face) : _v1(face._v1), _v2(face._v2), _v3(face._v3), _color(face._color) {};
-
-Face::Face(Face&& face)
-    : _v1(std::move(face._v1)),
-      _v2(std::move(face._v2)),
-      _v3(std::move(face._v3)),
-      _color(face._color) {};
-
-void Face::rotate(const Eigen::Matrix3f& rot)
+Mesh::Mesh(
+    std::vector<Eigen::Vector3f>&& vertices,
+    std::vector<Eigen::Vector3i>&& face_vertex_indices,
+    std::optional<std::vector<short>>&& colors)
+    : vertices(vertices),
+      face_vertex_indices(face_vertex_indices)
 {
-    _v1 = rot * _v1;
-    _v2 = rot * _v2;
-    _v3 = rot * _v3;
+    if (colors.has_value()) {
+        assert(face_vertex_indices.size() == colors.value().size());
+        this->colors = colors.value();
+    } else {
+        std::fill(this->colors.begin(), this->colors.end(), COLOR_PAIR_WHITE);
+    }
+}
+
+void Mesh::transform(const Eigen::Affine3f& t)
+{
+    for (auto& v : vertices) {
+        v = t * v;
+    }
+}
+
+
+Face Mesh::Iterator::operator*() const
+{
+    const auto& indices = ptr->face_vertex_indices[idx];
+    Face face(ptr->vertices[indices(0)], ptr->vertices[indices(1)], ptr->vertices[indices(2)], ptr->colors[idx]);
+    return face;
 }
 
 }  // namespace raster

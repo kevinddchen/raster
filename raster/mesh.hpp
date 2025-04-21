@@ -11,52 +11,15 @@ namespace raster
 /**
  * Triangle mesh face.
  */
-class Face
-{
-public:
-    /**
-     * Constructor, by copying input vectors.
-     */
-    Face(
-        const Eigen::Vector3f& v1,
-        const Eigen::Vector3f& v2,
-        const Eigen::Vector3f& v3,
-        short color = COLOR_PAIR_WHITE);
-
-    /**
-     * Constructor, by moving input vectors.
-     */
-    Face(Eigen::Vector3f&& v1, Eigen::Vector3f&& v2, Eigen::Vector3f&& v3, short color = COLOR_PAIR_WHITE);
-
-    /**
-     * Copy constructor.
-     */
-    Face(const Face& face);
-
-    /**
-     * Move constructor.
-     */
-    Face(Face&& face);
-
-    /**
-     * Apply rotation to mesh face.
-     */
-    void rotate(const Eigen::Matrix3f& rot);
-
-    inline const Eigen::Vector3f& v1() const { return _v1; }
-    inline const Eigen::Vector3f& v2() const { return _v2; }
-    inline const Eigen::Vector3f& v3() const { return _v3; }
-
-    inline short color() const { return _color; }
-
-private:
-    // NOTE: Vertices are in world coordinates.
-    Eigen::Vector3f _v1;
-    Eigen::Vector3f _v2;
-    Eigen::Vector3f _v3;
-
+struct Face {
+    // First vertex, in world coordiantes.
+    Eigen::Vector3f& v1;
+    // Second vertex, in world coordiantes.
+    Eigen::Vector3f& v2;
+    // Third vertex, in world coordiantes.
+    Eigen::Vector3f& v3;
     // ncurses color pair.
-    short _color;
+    short color;
 };
 
 /**
@@ -65,25 +28,37 @@ private:
 class Mesh
 {
 public:
-    // NOTE: For now, pass in a list of `Face`s, but in the future we want to pass in a list of vertices and faces as
-    // triples of vertex indices, like an OBJ file...
-    Mesh(std::vector<Face>&& faces) : faces(faces) {}
+    /**
+     * Create a mesh.
+     * @param vertices List of vertices, as 3D points in world coordinates.
+     * @param face_vertex_indices List of faces, represented as triples of integer indices corresponding to elements of
+     * `vertices`.
+     * @param colors (optional) List of color pair indices. If provided, must be the same length as `faces`. If not
+     * provided, will default to white.
+     */
+    Mesh(
+        std::vector<Eigen::Vector3f>&& vertices,
+        std::vector<Eigen::Vector3i>&& face_vertex_indices,
+        std::optional<std::vector<short>>&& colors = std::nullopt);
+
+    /**
+     * Apply an affine (i.e. rigid) transformation to the mesh.
+     */
+    void transform(const Eigen::Affine3f& t);
+
+    // -----------------------------------------------------------------------
 
     /**
      * Iterator over faces of the mesh.
      */
-    template <bool is_const>
     struct Iterator {
         using difference_type = std::ptrdiff_t;
         using value_type = Face;
 
-        using TFace = typename std::conditional_t<is_const, const Face, Face>;
-        using TMesh = typename std::conditional_t<is_const, const Mesh, Mesh>;
-
         Iterator() = default;
-        Iterator(TMesh* ptr, size_t idx) : ptr(ptr), idx(idx) {}
+        Iterator(Mesh* ptr, size_t idx) : ptr(ptr), idx(idx) {}
 
-        TFace& operator*() const { return ptr->faces[idx]; }
+        Face operator*() const;
 
         Iterator& operator++()
         {
@@ -101,20 +76,18 @@ public:
         bool operator==(const Iterator& other) const { return ptr == other.ptr && idx == other.idx; }
 
     private:
-        TMesh* ptr;
+        Mesh* ptr;
         size_t idx;
     };
-    static_assert(std::forward_iterator<Iterator<false>>);
-    static_assert(std::forward_iterator<Iterator<true>>);
+    static_assert(std::forward_iterator<Iterator>);
 
-    Iterator<false> begin() { return Iterator<false>(this, 0); }
-    Iterator<false> end() { return Iterator<false>(this, faces.size()); }
-    Iterator<true> cbegin() const { return Iterator<true>(this, 0); }
-    Iterator<true> cend() const { return Iterator<true>(this, faces.size()); }
+    Iterator begin() { return Iterator(this, 0); }
+    Iterator end() { return Iterator(this, face_vertex_indices.size()); }
 
 private:
-    // NOTE: Internal data structure to be changed...
-    std::vector<Face> faces;
+    std::vector<Eigen::Vector3f> vertices;
+    std::vector<Eigen::Vector3i> face_vertex_indices;
+    std::vector<short> colors;
 };
 
 }  // namespace raster
