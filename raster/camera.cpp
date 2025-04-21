@@ -112,7 +112,7 @@ Camera::Camera(int height, int width, float horizontal_fov, const Eigen::Affine3
 {
 }
 
-void Camera::render(Mesh& mesh) const
+void Camera::render(const Mesh& mesh) const
 {
     werase(window);
 

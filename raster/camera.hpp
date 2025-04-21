@@ -35,7 +35,7 @@ public:
     /**
      * Render the scene.
      */
-    void render(Mesh& mesh) const;
+    void render(const Mesh& mesh) const;
 
     WINDOW* const window;
 

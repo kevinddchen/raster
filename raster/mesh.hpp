@@ -4,6 +4,9 @@
 
 #include <Eigen/Dense>
 
+#include <optional>
+#include <vector>
+
 
 namespace raster
 {
@@ -12,12 +15,12 @@ namespace raster
  * Triangle mesh face.
  */
 struct Face {
-    // First vertex, in world coordiantes.
-    Eigen::Vector3f& v1;
-    // Second vertex, in world coordiantes.
-    Eigen::Vector3f& v2;
-    // Third vertex, in world coordiantes.
-    Eigen::Vector3f& v3;
+    // First vertex, as 3D point in world coordiantes.
+    const Eigen::Vector3f& v1;
+    // Second vertex, as 3D point in world coordiantes.
+    const Eigen::Vector3f& v2;
+    // Third vertex, as 3D point in world coordiantes.
+    const Eigen::Vector3f& v3;
     // ncurses color pair.
     short color;
 };
@@ -33,12 +36,12 @@ public:
      * @param vertices List of vertices, as 3D points in world coordinates.
      * @param face_vertex_indices List of faces, represented as triples of integer indices corresponding to elements of
      * `vertices`.
-     * @param colors (optional) List of color pair indices. If provided, must be the same length as `faces`. If not
+     * @param colors (Optional) List of color pair indices. If provided, must be the same length as `faces`. If not
      * provided, will default to white.
      */
     Mesh(
         std::vector<Eigen::Vector3f>&& vertices,
-        std::vector<Eigen::Vector3i>&& face_vertex_indices,
+        std::vector<Eigen::Array3i>&& face_vertex_indices,
         std::optional<std::vector<short>>&& colors = std::nullopt);
 
     /**
@@ -49,14 +52,14 @@ public:
     // -----------------------------------------------------------------------
 
     /**
-     * Iterator over faces of the mesh.
+     * Read-only iterator over faces of the mesh.
      */
     struct Iterator {
         using difference_type = std::ptrdiff_t;
         using value_type = Face;
 
         Iterator() = default;
-        Iterator(Mesh* ptr, size_t idx) : ptr(ptr), idx(idx) {}
+        Iterator(const Mesh* ptr, size_t idx) : ptr(ptr), idx(idx) {}
 
         Face operator*() const;
 
@@ -76,17 +79,17 @@ public:
         bool operator==(const Iterator& other) const { return ptr == other.ptr && idx == other.idx; }
 
     private:
-        Mesh* ptr;
+        const Mesh* ptr;
         size_t idx;
     };
     static_assert(std::forward_iterator<Iterator>);
 
-    Iterator begin() { return Iterator(this, 0); }
-    Iterator end() { return Iterator(this, face_vertex_indices.size()); }
+    Iterator begin() const { return Iterator(this, 0); }
+    Iterator end() const { return Iterator(this, face_vertex_indices.size()); }
 
 private:
     std::vector<Eigen::Vector3f> vertices;
-    std::vector<Eigen::Vector3i> face_vertex_indices;
+    std::vector<Eigen::Array3i> face_vertex_indices;
     std::vector<short> colors;
 };
 

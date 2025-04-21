@@ -6,7 +6,7 @@ namespace raster
 
 Mesh::Mesh(
     std::vector<Eigen::Vector3f>&& vertices,
-    std::vector<Eigen::Vector3i>&& face_vertex_indices,
+    std::vector<Eigen::Array3i>&& face_vertex_indices,
     std::optional<std::vector<short>>&& colors)
     : vertices(vertices),
       face_vertex_indices(face_vertex_indices)
@@ -15,7 +15,7 @@ Mesh::Mesh(
         assert(face_vertex_indices.size() == colors.value().size());
         this->colors = colors.value();
     } else {
-        std::fill(this->colors.begin(), this->colors.end(), COLOR_PAIR_WHITE);
+        this->colors = std::vector<short>(face_vertex_indices.size(), COLOR_WHITE);
     }
 }
 
@@ -26,12 +26,10 @@ void Mesh::transform(const Eigen::Affine3f& t)
     }
 }
 
-
 Face Mesh::Iterator::operator*() const
 {
     const auto& indices = ptr->face_vertex_indices[idx];
-    Face face(ptr->vertices[indices(0)], ptr->vertices[indices(1)], ptr->vertices[indices(2)], ptr->colors[idx]);
-    return face;
+    return {ptr->vertices[indices(0)], ptr->vertices[indices(1)], ptr->vertices[indices(2)], ptr->colors[idx]};
 }
 
 }  // namespace raster

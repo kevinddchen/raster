@@ -32,9 +32,9 @@ int main()
         Eigen::Vector3f{0.0, -0.5, -0.5},
     };
 
-    std::vector<Eigen::Vector3i> face_vertex_indices = {
-        Eigen::Vector3i{0, 1, 2},
-        Eigen::Vector3i{3, 4, 5},
+    std::vector<Eigen::Array3i> face_vertex_indices = {
+        Eigen::Array3i{0, 1, 2},
+        Eigen::Array3i{3, 4, 5},
     };
 
     std::vector<short> colors = {raster::COLOR_PAIR_RED, raster::COLOR_PAIR_GREEN};
