@@ -65,7 +65,7 @@ int main()
     for (long iframe = 1;; ++iframe) {
         const auto t_frame = now();
 
-        Eigen::Affine3f rot(Eigen::AngleAxisf(ROTATION_PER_SEC / FRAMES_PER_SEC, Eigen::Vector3f::UnitZ()));
+        const Eigen::Affine3f rot(Eigen::AngleAxisf(ROTATION_PER_SEC / FRAMES_PER_SEC, Eigen::Vector3f::UnitZ()));
         mesh.transform(rot);
 
         camera.render(mesh);

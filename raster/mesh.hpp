@@ -4,6 +4,7 @@
 
 #include <Eigen/Dense>
 
+#include <iterator>
 #include <optional>
 #include <vector>
 
