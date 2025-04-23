@@ -1,5 +1,9 @@
 #include <raster/camera.hpp>
 
+#include <algorithm>
+
+#include <cmath>
+
 
 namespace
 {
@@ -7,9 +11,9 @@ namespace
 /**
  * Project a 3D point from camera space to the image plane.
  *
- * @param v Input 3D point, in camera coordinates.
- * @param p Reference to output 2D point, in image plane.
- * @returns False if the point cannot be projected into the image plane.
+ * @param[in] v Input 3D point, in camera coordinates.
+ * @param[out] p Output 2D point, in image plane.
+ * @returns False if the point cannot be projected into the image plane, true if otherwise successful.
  */
 bool project_point(const Eigen::Vector3f& v, Eigen::Vector2f& p)
 {
@@ -62,13 +66,13 @@ inline float edge_function(const Eigen::Vector2f& p, const Eigen::Vector2f& a, c
  * Returns true if the point `q` is interior to the triangle with the given vertices, or on one of its edges. Also
  * computes the barycentric coordinates of `q`.
  *
- * @param q Query point.
- * @param p1 Triangle vertex.
- * @param p2 Triangle vertex.
- * @param p3 Triangle vertex.
- * @param b1 Will be set to the barycentric coordinate of `q` relative to `p1`.
- * @param b2 Will be set to the barycentric coordinate of `q` relative to `p2`.
- * @param b3 Will be set to the barycentric coordinate of `q` relative to `p3`.
+ * @param[in] q Query point.
+ * @param[in] p1 Triangle vertex.
+ * @param[in] p2 Triangle vertex.
+ * @param[in] p3 Triangle vertex.
+ * @param[out] b1 The barycentric coordinate of `q` relative to `p1`.
+ * @param[out] b2 The barycentric coordinate of `q` relative to `p2`.
+ * @param[out] b3 The barycentric coordinate of `q` relative to `p3`.
  *
  * NOTE: Top-left rule has not been implemented.
  */

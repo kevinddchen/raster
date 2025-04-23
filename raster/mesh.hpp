@@ -34,11 +34,12 @@ class Mesh
 public:
     /**
      * Create a mesh.
+     *
      * @param vertices List of vertices, as 3D points in world coordinates.
      * @param face_vertex_indices List of faces, represented as triples of integer indices corresponding to elements of
-     * `vertices`.
+     *     `vertices`.
      * @param colors (Optional) List of color pair indices. If provided, must be the same length as `faces`. If not
-     * provided, will default to white.
+     *     provided, will default to all faces being white.
      */
     Mesh(
         std::vector<Eigen::Vector3f>&& vertices,
@@ -72,7 +73,7 @@ public:
 
         Iterator operator++(int)
         {
-            auto tmp = *this;
+            const auto tmp = *this;
             ++*this;
             return tmp;
         }
@@ -85,7 +86,14 @@ public:
     };
     static_assert(std::forward_iterator<Iterator>);
 
+    /**
+     * Iterator to the beginning of the collection of faces.
+     */
     Iterator begin() const { return Iterator(this, 0); }
+
+    /**
+     * Iterator to the end of the collecrtion of faces.
+     */
     Iterator end() const { return Iterator(this, face_vertex_indices.size()); }
 
 private:

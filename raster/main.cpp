@@ -5,6 +5,7 @@
 
 #include <numbers>
 #include <thread>
+#include <vector>
 
 
 constexpr double FRAMES_PER_SEC = 30;

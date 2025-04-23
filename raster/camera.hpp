@@ -25,6 +25,7 @@ class Camera
 public:
     /**
      * Create new perspective camera.
+     *
      * @param height Image height, in pixels.
      * @param width Image width, in pixels.
      * @param horizontal_fov Horizontal field of view, in radians.
