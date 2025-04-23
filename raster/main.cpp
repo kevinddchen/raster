@@ -22,23 +22,31 @@ int main()
     // -----------------------------------------------------------------------
 
     // world "up" is the +z axis
+    // create a pyramid
     std::vector<Eigen::Vector3f> vertices = {
-        // create a red triangle at the origin, in the xz-plane
-        Eigen::Vector3f{0.0, 0.0, 0.5},
-        Eigen::Vector3f{0.5, 0.0, -0.5},
-        Eigen::Vector3f{-0.5, 0.0, -0.5},
-        // create a green triangle at the origin, in the yz-plane
-        Eigen::Vector3f{0.0, 0.0, 0.5},
-        Eigen::Vector3f{0.0, 0.5, -0.5},
-        Eigen::Vector3f{0.0, -0.5, -0.5},
+        Eigen::Vector3f{0.0, 0.0, 0.8},
+        Eigen::Vector3f{0.5, 0.0, -0.4},
+        Eigen::Vector3f{0.0, 0.5, -0.4},
+        Eigen::Vector3f{-0.5, 0.0, -0.4},
+        Eigen::Vector3f{0.0, -0.5, -0.4},
     };
 
     std::vector<Eigen::Array3i> face_vertex_indices = {
         Eigen::Array3i{0, 1, 2},
-        Eigen::Array3i{3, 4, 5},
+        Eigen::Array3i{0, 2, 3},
+        Eigen::Array3i{0, 3, 4},
+        Eigen::Array3i{0, 4, 1},
+        Eigen::Array3i{1, 3, 2},
+        Eigen::Array3i{1, 4, 3},
     };
 
-    std::vector<short> colors = {raster::COLOR_PAIR_RED, raster::COLOR_PAIR_GREEN};
+    std::vector<short> colors = {
+        raster::COLOR_PAIR_RED,
+        raster::COLOR_PAIR_GREEN,
+        raster::COLOR_PAIR_YELLOW,
+        raster::COLOR_PAIR_BLUE,
+        raster::COLOR_PAIR_MAGENTA,
+        raster::COLOR_PAIR_CYAN};
 
     raster::Mesh mesh(std::move(vertices), std::move(face_vertex_indices), std::move(colors));
 
