@@ -21,7 +21,8 @@ int main()
 
     // -----------------------------------------------------------------------
 
-    // world "up" is the +z axis
+    // NOTE: world "up" is the +z axis
+
     // create a pyramid
     std::vector<Eigen::Vector3f> vertices = {
         Eigen::Vector3f{0.0, 0.0, 0.8},
@@ -50,18 +51,12 @@ int main()
 
     raster::Mesh mesh(std::move(vertices), std::move(face_vertex_indices), std::move(colors));
 
-    // create a camera looking at the triangle
-    // camera is on the y-axis looking at the origin.
-    // camera +x = world -x
-    // camera +y = world -z
-    // camera +z = world -y
-    const Eigen::Matrix3f rot{{-1, 0, 0}, {0, 0, -1}, {0, -1, 0}};
-    const Eigen::Vector3f trans{0, 1, 0};
-    Eigen::Affine3f pose;
-    pose.linear() = rot;
-    pose.translation() = trans;
+    // create a camera away from origin looking at the triangle
 
-    raster::Camera camera(50, 50, std::numbers::pi / 2, pose);
+    raster::Camera camera(50, 50, std::numbers::pi / 2);
+
+    camera.transform(Eigen::Affine3f(Eigen::Translation3f(1, 0, 0)));
+    camera.look_at(Eigen::Vector3f(0, 0, 0));
 
     // ----------------------------------------------------------------------
     // render loop

@@ -179,4 +179,35 @@ void Camera::render(const Mesh& mesh) const
     wnoutrefresh(window);
 }
 
+void Camera::transform(const Eigen::Affine3f& t)
+{
+    camera_to_world = t * camera_to_world;
+    world_to_camera = world_to_camera * t.inverse();
+}
+
+void Camera::look_at(const Eigen::Vector3f& look_at_point, const Eigen::Vector3f& world_up)
+{
+    // first, determine the camera forward, up, and right in world coordinates
+    Eigen::Vector3f camera_forward = look_at_point - camera_to_world.translation();
+    camera_forward.normalize();
+
+    Eigen::Vector3f camera_up = world_up - camera_forward * world_up.dot(camera_forward);
+    assert(camera_up.norm() > 1e-6);  // make sure `look_at_point` and `world_up` are not parallel
+    camera_up.normalize();
+
+    Eigen::Vector3f camera_right = camera_forward.cross(camera_up);
+
+    // construct the rotation. recall that:
+    // - "forward" is the +z direction.
+    // - "up" is the -y direction.
+    // - "right" is the +x direction.
+    Eigen::Matrix3f rotation;
+    rotation.col(0) = camera_right;
+    rotation.col(1) = -camera_up;
+    rotation.col(2) = camera_forward;
+
+    camera_to_world.linear() = rotation;
+    world_to_camera = camera_to_world.inverse();
+}
+
 }  // namespace raster
