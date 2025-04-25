@@ -23,7 +23,7 @@ struct Face {
     // Third vertex, as 3D point in world coordiantes.
     const Eigen::Vector3f& v3;
     // ncurses color pair.
-    short color;
+    const short color;
 };
 
 /**

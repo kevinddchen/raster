@@ -25,10 +25,10 @@ bool project_point(const Eigen::Vector3f& v, Eigen::Vector2f& p)
 }
 
 struct BoundingBox {
-    int min_row;
-    int max_row;
-    int min_col;
-    int max_col;
+    const int min_row;
+    const int max_row;
+    const int min_col;
+    const int max_col;
 };
 
 /**
