@@ -24,9 +24,7 @@ std::chrono::steady_clock::time_point now()
 namespace raster
 {
 
-App::App(int rows, int cols, double frames_per_sec) : rows(rows), cols(cols), frames_per_sec(frames_per_sec) {}
-
-void App::run()
+App::App(int rows, int cols, double frames_per_sec) : frames_per_sec(frames_per_sec)
 {
     // NOTE: world "up" is the +z axis
 
@@ -56,17 +54,16 @@ void App::run()
         raster::COLOR_PAIR_MAGENTA,
         raster::COLOR_PAIR_CYAN};
 
-    raster::Mesh mesh(std::move(vertices), std::move(face_vertex_indices), std::move(colors));
+    mesh = Mesh(std::move(vertices), std::move(face_vertex_indices), std::move(colors));
 
     // create a camera away from origin looking at the triangle
-
-    raster::Camera camera(50, 50, std::numbers::pi / 2);
+    camera = Camera(rows, cols, std::numbers::pi / 2);
     camera.transform(Eigen::Affine3f(Eigen::Translation3f(1, 0, 0)));
     camera.look_at(Eigen::Vector3f(0, 0, 0));
+}
 
-    // ----------------------------------------------------------------------
-    // render loop
-
+void App::run()
+{
     // How much time passes between frames
     const std::chrono::duration<double, std::milli> frame_interval(1000.0 / frames_per_sec);
     // How much to rotate every second

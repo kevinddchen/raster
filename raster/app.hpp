@@ -1,5 +1,8 @@
 #pragma once
 
+#include <raster/camera.hpp>
+#include <raster/mesh.hpp>
+
 
 namespace raster
 {
@@ -22,8 +25,8 @@ public:
     void run();
 
 private:
-    const int rows;
-    const int cols;
+    Mesh mesh;
+    Camera camera;
 
     const double frames_per_sec;
 };

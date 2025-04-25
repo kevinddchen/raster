@@ -1,5 +1,7 @@
 #include <raster/mesh.hpp>
 
+#include <raster/ncurses.hpp>
+
 
 namespace raster
 {
@@ -17,6 +19,21 @@ Mesh::Mesh(
     } else {
         this->colors = std::vector<short>(face_vertex_indices.size(), COLOR_WHITE);
     }
+}
+
+Mesh::Mesh(Mesh&& other)
+    : vertices(std::move(other.vertices)),
+      face_vertex_indices(std::move(other.face_vertex_indices)),
+      colors(std::move(other.colors))
+{
+}
+
+Mesh& Mesh::operator=(Mesh&& other)
+{
+    vertices = std::move(other.vertices);
+    face_vertex_indices = std::move(other.face_vertex_indices);
+    colors = std::move(other.colors);
+    return *this;
 }
 
 void Mesh::transform(const Eigen::Affine3f& t)

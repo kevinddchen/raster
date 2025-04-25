@@ -1,7 +1,5 @@
 #pragma once
 
-#include <raster/ncurses.hpp>
-
 #include <Eigen/Dense>
 
 #include <iterator>
@@ -32,6 +30,8 @@ struct Face {
 class Mesh
 {
 public:
+    Mesh() = default;
+
     /**
      * Create a mesh.
      *
@@ -45,6 +45,13 @@ public:
         std::vector<Eigen::Vector3f>&& vertices,
         std::vector<Eigen::Array3i>&& face_vertex_indices,
         std::optional<std::vector<short>>&& colors = std::nullopt);
+
+    // NOTE: copy constructors are deleted to prevent expensive copies
+    Mesh(const Mesh&) = delete;
+    Mesh& operator=(const Mesh&) = delete;
+
+    Mesh(Mesh&& other);
+    Mesh& operator=(Mesh&& other);
 
     /**
      * Apply an affine (i.e. rigid) transformation to the mesh.

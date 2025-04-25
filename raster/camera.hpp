@@ -23,6 +23,8 @@ namespace raster
 class Camera
 {
 public:
+    Camera() = default;
+
     /**
      * Create new perspective camera.
      *
@@ -31,12 +33,18 @@ public:
      * @param horizontal_fov Horizontal field of view, in radians.
      * @param camera_to_world Camera-to-world pose.
      */
-    Camera(int height, int width, float horizontal_fov, const Eigen::Affine3f& camera_to_world);
+    Camera(
+        int height,
+        int width,
+        float horizontal_fov,
+        const Eigen::Affine3f& camera_to_world = Eigen::Affine3f::Identity());
 
-    Camera(int height, int width, float horizontal_fov)
-        : Camera(height, width, horizontal_fov, Eigen::Affine3f::Identity())
-    {
-    }
+    // NOTE: copy constructors are deleted to prevent expensive copies
+    Camera(const Camera&) = delete;
+    Camera& operator=(const Camera&) = delete;
+
+    Camera(Camera&& other);
+    Camera& operator=(Camera&& other);
 
     /**
      * Render the scene.
@@ -58,17 +66,25 @@ public:
     void look_at(const Eigen::Vector3f& look_at_point, const Eigen::Vector3f& world_up = Eigen::Vector3f::UnitZ());
 
 private:
-    WINDOW* const window;
+    struct Intrinsics {
+        int width;
+        int height;
+        float cx;
+        float cy;
+        float fx;
+        float fy;
+    };
 
+    /**
+     * Convert a 2D point in the image plane coordinates to pixel coordinates.
+     */
+    static Eigen::Vector2f image_plane_to_pixel(const Eigen::Vector2f& p, const Intrinsics& intrinsics);
+
+    WINDOW* window;
+
+    Intrinsics intrinsics;
     Eigen::Affine3f camera_to_world;
     Eigen::Affine3f world_to_camera;
-
-    const int width;
-    const int height;
-    const float cx;
-    const float cy;
-    const float fx;
-    const float fy;
 };
 
 }  // namespace raster

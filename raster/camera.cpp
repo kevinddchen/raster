@@ -105,15 +105,35 @@ namespace raster
 
 Camera::Camera(int height, int width, float horizontal_fov, const Eigen::Affine3f& pose)
     : window(newwin(height, width, 0, 0)),
+      intrinsics(
+          {.width = width,
+           .height = height,
+           .cx = width / 2.f - 0.5f,
+           .cy = height / 2.f - 0.5f,
+           .fx = (width / 2.f) * std::tan(horizontal_fov / 2.f),
+           .fy = (height / 2.f) * std::tan(horizontal_fov / 2.f)}),
       camera_to_world(pose),
-      world_to_camera(pose.inverse()),
-      width(width),
-      height(height),
-      cx(width / 2.0 - 0.5),
-      cy(height / 2.0 - 0.5),
-      fx((width / 2.0) * std::tan(horizontal_fov / 2.0)),
-      fy(height * fx / width)
+      world_to_camera(pose.inverse())
 {
+}
+
+Camera::Camera(Camera&& other)
+    : window(other.window),
+      intrinsics(std::move(other.intrinsics)),
+      camera_to_world(std::move(other.camera_to_world)),
+      world_to_camera(std::move(other.world_to_camera))
+{
+    other.window = nullptr;
+}
+
+Camera& Camera::operator=(Camera&& other)
+{
+    window = other.window;
+    other.window = nullptr;
+    intrinsics = std::move(other.intrinsics);
+    camera_to_world = std::move(other.camera_to_world);
+    world_to_camera = std::move(other.world_to_camera);
+    return *this;
 }
 
 void Camera::render(const Mesh& mesh) const
@@ -124,7 +144,7 @@ void Camera::render(const Mesh& mesh) const
     box(window, 0, 0);
 
     // initialize z-buffer
-    Eigen::ArrayXXf z_buf = Eigen::ArrayXXf::Constant(height, width, -1.0);
+    Eigen::ArrayXXf z_buf = Eigen::ArrayXXf::Constant(intrinsics.height, intrinsics.width, -1.0);
 
     for (auto ptr = mesh.begin(); ptr != mesh.end(); ++ptr) {
         const auto& face = *ptr;
@@ -141,10 +161,10 @@ void Camera::render(const Mesh& mesh) const
             continue;
         }
 
-        // convert from normalized coords to pixel coords
-        const Eigen::Vector2f pix1 = {fx * p1.x() + cx, fy * p1.y() + cy};
-        const Eigen::Vector2f pix2 = {fx * p2.x() + cx, fy * p2.y() + cy};
-        const Eigen::Vector2f pix3 = {fx * p3.x() + cx, fy * p3.y() + cy};
+        // convert from image plane coords to pixel coords
+        const Eigen::Vector2f pix1 = image_plane_to_pixel(p1, intrinsics);
+        const Eigen::Vector2f pix2 = image_plane_to_pixel(p2, intrinsics);
+        const Eigen::Vector2f pix3 = image_plane_to_pixel(p3, intrinsics);
 
         // get bounding box
         const BoundingBox bbox = get_bounding_box(pix1, pix2, pix3);
@@ -208,6 +228,11 @@ void Camera::look_at(const Eigen::Vector3f& look_at_point, const Eigen::Vector3f
 
     camera_to_world.linear() = rotation;
     world_to_camera = camera_to_world.inverse();
+}
+
+Eigen::Vector2f Camera::image_plane_to_pixel(const Eigen::Vector2f& p, const Intrinsics& intrinsics)
+{
+    return {intrinsics.fx * p.x() + intrinsics.cx, intrinsics.fy * p.y() + intrinsics.cy};
 }
 
 }  // namespace raster
