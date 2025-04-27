@@ -87,6 +87,9 @@ void App::run()
         camera.render(mesh);
         doupdate();
 
+        // clear input buffer to avoid keystrokes from building up
+        flushinp();
+
         // wait until frame ends
         const std::chrono::duration<double, std::milli> remaining_interval = frame_interval - (now() - t_frame);
         std::this_thread::sleep_for(max(remaining_interval, std::chrono::duration<double, std::milli>::zero()));
