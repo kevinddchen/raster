@@ -104,7 +104,7 @@ namespace raster
 {
 
 Camera::Camera(int height, int width, float horizontal_fov, const Eigen::Affine3f& pose)
-    : window(newwin(height, width, 0, 0)),
+    : _window(newwin(height, width, 0, 0)),
       intrinsics(
           {.width = width,
            .height = height,
@@ -118,18 +118,18 @@ Camera::Camera(int height, int width, float horizontal_fov, const Eigen::Affine3
 }
 
 Camera::Camera(Camera&& other)
-    : window(other.window),
+    : _window(other._window),
       intrinsics(std::move(other.intrinsics)),
       camera_to_world(std::move(other.camera_to_world)),
       world_to_camera(std::move(other.world_to_camera))
 {
-    other.window = nullptr;
+    other._window = nullptr;
 }
 
 Camera& Camera::operator=(Camera&& other)
 {
-    window = other.window;
-    other.window = nullptr;
+    _window = other._window;
+    other._window = nullptr;
     intrinsics = std::move(other.intrinsics);
     camera_to_world = std::move(other.camera_to_world);
     world_to_camera = std::move(other.world_to_camera);
@@ -138,10 +138,10 @@ Camera& Camera::operator=(Camera&& other)
 
 void Camera::render(const Mesh& mesh) const
 {
-    werase(window);
+    werase(_window);
 
     // draw border
-    box(window, 0, 0);
+    box(_window, 0, 0);
 
     // initialize z-buffer
     Eigen::ArrayXXf z_buf = Eigen::ArrayXXf::Constant(intrinsics.height, intrinsics.width, -1.0);
@@ -171,7 +171,7 @@ void Camera::render(const Mesh& mesh) const
 
         // select color
         const chtype attr = COLOR_PAIR(face.color);
-        wattron(window, attr);
+        wattron(_window, attr);
 
         // rasterize mesh face
         for (int row = bbox.min_row; row <= bbox.max_row; ++row) {
@@ -188,15 +188,15 @@ void Camera::render(const Mesh& mesh) const
                 if (float prev_z = z_buf(row, col); prev_z < 0 || z < prev_z) {
                     // update z-buffer and render pixel
                     z_buf(row, col) = z;
-                    mvwaddch(window, row, col, 'X');
+                    mvwaddch(_window, row, col, 'X');
                 }
             }
         }
 
-        wattroff(window, attr);
+        wattroff(_window, attr);
     }
 
-    wnoutrefresh(window);
+    wnoutrefresh(_window);
 }
 
 void Camera::transform(const Eigen::Affine3f& t)

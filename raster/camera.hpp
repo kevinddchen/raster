@@ -65,6 +65,8 @@ public:
      */
     void look_at(const Eigen::Vector3f& look_at_point, const Eigen::Vector3f& world_up = Eigen::Vector3f::UnitZ());
 
+    inline WINDOW* window() const { return _window; }
+
 private:
     struct Intrinsics {
         int width;
@@ -80,7 +82,7 @@ private:
      */
     static Eigen::Vector2f image_plane_to_pixel(const Eigen::Vector2f& p, const Intrinsics& intrinsics);
 
-    WINDOW* window;
+    WINDOW* _window;
 
     Intrinsics intrinsics;
     Eigen::Affine3f camera_to_world;

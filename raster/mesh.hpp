@@ -96,12 +96,12 @@ public:
     /**
      * Iterator to the beginning of the collection of faces.
      */
-    Iterator begin() const { return Iterator(this, 0); }
+    inline Iterator begin() const { return Iterator(this, 0); }
 
     /**
      * Iterator to the end of the collecrtion of faces.
      */
-    Iterator end() const { return Iterator(this, face_vertex_indices.size()); }
+    inline Iterator end() const { return Iterator(this, face_vertex_indices.size()); }
 
 private:
     std::vector<Eigen::Vector3f> vertices;

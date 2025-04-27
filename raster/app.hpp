@@ -25,6 +25,14 @@ public:
     void run();
 
 private:
+    /**
+     * Perform action associated with given keystroke.
+     *
+     * @param key Key pressed.
+     * @returns False when we want to quit.
+     */
+    bool handle_keystroke(int key);
+
     Mesh mesh;
     Camera camera;
 

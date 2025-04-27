@@ -31,8 +31,6 @@ inline void init_ncurses()
     init_pair(COLOR_PAIR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(COLOR_PAIR_CYAN, COLOR_CYAN, COLOR_BLACK);
     init_pair(COLOR_PAIR_WHITE, COLOR_WHITE, COLOR_BLACK);
-
-    curs_set(0);  // hide cursor
 }
 
 /**
