@@ -215,7 +215,7 @@ void Camera::look_at(const Eigen::Vector3f& look_at_point, const Eigen::Vector3f
     assert(camera_up.norm() > 1e-6);  // make sure `look_at_point` and `world_up` are not parallel
     camera_up.normalize();
 
-    Eigen::Vector3f camera_right = camera_forward.cross(camera_up);
+    const Eigen::Vector3f camera_right = camera_forward.cross(camera_up);
 
     // construct the rotation. recall that:
     // - "forward" is the +z direction.

@@ -11,7 +11,7 @@ namespace raster
 {
 
 /**
- * Triangle mesh face.
+ * Triangle face of a mesh.
  */
 struct Face {
     // First vertex, as 3D point in world coordiantes.
@@ -25,7 +25,7 @@ struct Face {
 };
 
 /**
- * A mesh consists of a collection of faces.
+ * A mesh consists of a collection of triangle faces.
  */
 class Mesh
 {
@@ -99,7 +99,7 @@ public:
     inline Iterator begin() const { return Iterator(this, 0); }
 
     /**
-     * Iterator to the end of the collecrtion of faces.
+     * Iterator to the end of the collection of faces.
      */
     inline Iterator end() const { return Iterator(this, face_vertex_indices.size()); }
 
