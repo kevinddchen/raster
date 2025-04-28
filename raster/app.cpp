@@ -2,6 +2,7 @@
 
 #include <raster/camera.hpp>
 #include <raster/ncurses.hpp>
+#include <raster/physics.hpp>
 
 #include <Eigen/Dense>
 
@@ -13,8 +14,7 @@
 namespace
 {
 
-// How much to rotate every second
-constexpr double ROTATION_PER_SEC = std::numbers::pi;
+constexpr float ANGULAR_ACCELERATION = 0.01;
 
 std::chrono::steady_clock::time_point now()
 {
@@ -27,7 +27,7 @@ std::chrono::steady_clock::time_point now()
 namespace raster
 {
 
-App::App(int rows, int cols, double frames_per_sec) : frames_per_sec(frames_per_sec)
+App::App(int rows, int cols, double frames_per_sec) : mesh_inertial(0.99f, 0.99f), frames_per_sec(frames_per_sec)
 {
     // NOTE: world "up" is the +z axis
 
@@ -98,18 +98,18 @@ void App::run()
 
 bool App::handle_keystroke(int key)
 {
+    Eigen::Vector3f delta_angular_velocity = Eigen::Vector3f::Zero();
+
     // handle keystroke
     switch (key) {
         case 'a':
         case KEY_LEFT: {
-            const Eigen::Affine3f rot(Eigen::AngleAxisf(-ROTATION_PER_SEC / frames_per_sec, Eigen::Vector3f::UnitZ()));
-            mesh.transform(rot);
+            delta_angular_velocity = {0, 0, -ANGULAR_ACCELERATION};
             break;
         }
         case 'd':
         case KEY_RIGHT: {
-            const Eigen::Affine3f rot(Eigen::AngleAxisf(ROTATION_PER_SEC / frames_per_sec, Eigen::Vector3f::UnitZ()));
-            mesh.transform(rot);
+            delta_angular_velocity = {0, 0, ANGULAR_ACCELERATION};
             break;
         }
         case 'r':  // refresh
@@ -120,6 +120,11 @@ bool App::handle_keystroke(int key)
         default:
             break;
     }
+
+    // update mesh
+    const Eigen::Affine3f delta_pose = mesh_inertial.update(Eigen::Vector3f::Zero(), delta_angular_velocity);
+    mesh.transform(delta_pose);
+
     return true;
 }
 

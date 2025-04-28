@@ -2,6 +2,7 @@
 
 #include <raster/camera.hpp>
 #include <raster/mesh.hpp>
+#include <raster/physics.hpp>
 
 
 namespace raster
@@ -34,6 +35,7 @@ private:
     bool handle_keystroke(int key);
 
     Mesh mesh;
+    Inertial mesh_inertial;
     Camera camera;
 
     const double frames_per_sec;
