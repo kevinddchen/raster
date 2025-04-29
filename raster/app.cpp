@@ -33,11 +33,11 @@ App::App(int rows, int cols, double frames_per_sec) : mesh_inertial(0.99f, 0.99f
 
     // create a pyramid
     std::vector<Eigen::Vector3f> vertices = {
-        Eigen::Vector3f{0.0, 0.0, 0.8},
-        Eigen::Vector3f{0.5, 0.0, -0.4},
-        Eigen::Vector3f{0.0, 0.5, -0.4},
-        Eigen::Vector3f{-0.5, 0.0, -0.4},
-        Eigen::Vector3f{0.0, -0.5, -0.4},
+        Eigen::Vector3f{0.0, 0.0, 0.5},
+        Eigen::Vector3f{0.5, 0.0, -0.5},
+        Eigen::Vector3f{0.0, 0.5, -0.5},
+        Eigen::Vector3f{-0.5, 0.0, -0.5},
+        Eigen::Vector3f{0.0, -0.5, -0.5},
     };
 
     std::vector<Eigen::Array3i> face_vertex_indices = {
@@ -55,7 +55,7 @@ App::App(int rows, int cols, double frames_per_sec) : mesh_inertial(0.99f, 0.99f
         raster::COLOR_PAIR_YELLOW,
         raster::COLOR_PAIR_BLUE,
         raster::COLOR_PAIR_MAGENTA,
-        raster::COLOR_PAIR_CYAN};
+        raster::COLOR_PAIR_MAGENTA};
 
     mesh = Mesh(std::move(vertices), std::move(face_vertex_indices), std::move(colors));
 
@@ -105,6 +105,16 @@ bool App::handle_keystroke(int key)
         case 'a':
         case KEY_LEFT: {
             delta_angular_velocity = {0, 0, -ANGULAR_ACCELERATION};
+            break;
+        }
+        case 's':
+        case KEY_DOWN: {
+            delta_angular_velocity = {0, ANGULAR_ACCELERATION, 0};
+            break;
+        }
+        case 'w':
+        case KEY_UP: {
+            delta_angular_velocity = {0, -ANGULAR_ACCELERATION, 0};
             break;
         }
         case 'd':
