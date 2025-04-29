@@ -34,8 +34,15 @@ struct BoundingBox {
 /**
  * Given the vertices of a triangle on the 2D plane, compute the bounding box. We round the box coordinates to integer
  * values in a way that makes the tightest box around the points interior to the triangle and on its edges.
+ *
+ * @param p1 First 2D point, in pixel coordinates.
+ * @param p2 Second 2D point, in pixel coordiantes.
+ * @param p3 Third 2D point, in pixel coordinates.
+ * @param height Image height, in pixels.
+ * @param width Image width, in pixels.
  */
-BoundingBox get_bounding_box(const Eigen::Vector2f& p1, const Eigen::Vector2f& p2, const Eigen::Vector2f& p3)
+BoundingBox get_bounding_box(
+    const Eigen::Vector2f& p1, const Eigen::Vector2f& p2, const Eigen::Vector2f& p3, int height, int width)
 {
     const float min_x = std::min(p1.x(), std::min(p2.x(), p3.x()));
     const float max_x = std::max(p1.x(), std::max(p2.x(), p3.x()));
@@ -43,10 +50,11 @@ BoundingBox get_bounding_box(const Eigen::Vector2f& p1, const Eigen::Vector2f& p
     const float max_y = std::max(p1.y(), std::max(p2.y(), p3.y()));
 
     return {
-        .min_row = static_cast<int>(std::ceil(min_y)),
-        .max_row = static_cast<int>(std::floor(max_y)),
-        .min_col = static_cast<int>(std::ceil(min_x)),
-        .max_col = static_cast<int>(std::floor(max_x))};
+        .min_row = std::max(0, static_cast<int>(std::ceil(min_y))),
+        .max_row = std::min(height - 1, static_cast<int>(std::floor(max_y))),
+        .min_col = std::max(0, static_cast<int>(std::ceil(min_x))),
+        .max_col = std::min(width - 1, static_cast<int>(std::floor(max_x))),
+    };
 }
 
 /**
@@ -167,7 +175,7 @@ void Camera::render(const Mesh& mesh) const
         const Eigen::Vector2f pix3 = image_plane_to_pixel(p3, intrinsics);
 
         // get bounding box
-        const BoundingBox bbox = get_bounding_box(pix1, pix2, pix3);
+        const BoundingBox bbox = get_bounding_box(pix1, pix2, pix3, intrinsics.height, intrinsics.width);
 
         // select color
         const chtype attr = COLOR_PAIR(face.color);
@@ -185,7 +193,7 @@ void Camera::render(const Mesh& mesh) const
                 // compute z for the corresponding point on the triangle in camera space. recall that due to projection,
                 // the value of 1/z is linearly interpolated in the image plane by barycentric coords
                 const float z = 1 / (b1 / v1.z() + b2 / v2.z() + b3 / v3.z());
-                if (float prev_z = z_buf(row, col); prev_z < 0 || z < prev_z) {
+                if (const float prev_z = z_buf(row, col); prev_z < 0 || z < prev_z) {
                     // update z-buffer and render pixel
                     z_buf(row, col) = z;
                     mvwaddch(_window, row, col, 'X');

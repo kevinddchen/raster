@@ -33,11 +33,11 @@ App::App(int rows, int cols, double frames_per_sec) : mesh_inertial(0.99f, 0.99f
 
     // create a pyramid
     std::vector<Eigen::Vector3f> vertices = {
-        Eigen::Vector3f{0.0, 0.0, 0.5},
-        Eigen::Vector3f{0.5, 0.0, -0.5},
-        Eigen::Vector3f{0.0, 0.5, -0.5},
-        Eigen::Vector3f{-0.5, 0.0, -0.5},
-        Eigen::Vector3f{0.0, -0.5, -0.5},
+        Eigen::Vector3f{0.0, 0.0, 0.8},
+        Eigen::Vector3f{0.5, 0.0, -0.4},
+        Eigen::Vector3f{0.0, 0.5, -0.4},
+        Eigen::Vector3f{-0.5, 0.0, -0.4},
+        Eigen::Vector3f{0.0, -0.5, -0.4},
     };
 
     std::vector<Eigen::Array3i> face_vertex_indices = {
