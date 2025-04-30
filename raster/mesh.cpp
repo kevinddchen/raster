@@ -1,7 +1,5 @@
 #include <raster/mesh.hpp>
 
-#include <raster/ncurses.hpp>
-
 
 namespace raster
 {
@@ -17,7 +15,7 @@ Mesh::Mesh(
         assert(face_vertex_indices.size() == colors.value().size());
         this->colors = colors.value();
     } else {
-        this->colors = std::vector<short>(face_vertex_indices.size(), COLOR_WHITE);
+        this->colors = std::vector<short>(face_vertex_indices.size(), 5 * 36 + 5 * 6 + 5);  // white
     }
 }
 

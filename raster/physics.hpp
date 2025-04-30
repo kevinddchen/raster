@@ -39,11 +39,11 @@ public:
     Eigen::Affine3f update(const Eigen::Vector3f& delta_velocity, const Eigen::Vector3f& delta_angular_velocity);
 
 private:
-    Eigen::Vector3f pos_velocity;
-    Eigen::Vector3f ang_velocity;
-
     const float pos_friction;
     const float ang_friction;
+
+    Eigen::Vector3f pos_velocity;
+    Eigen::Vector3f ang_velocity;
 };
 
 }  // namespace raster

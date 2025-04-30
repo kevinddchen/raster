@@ -196,7 +196,7 @@ void Camera::render(const Mesh& mesh) const
                 if (const float prev_z = z_buf(row, col); prev_z < 0 || z < prev_z) {
                     // update z-buffer and render pixel
                     z_buf(row, col) = z;
-                    mvwaddch(_window, row, col, 'X');
+                    mvwaddch(_window, row, col, ' ');
                 }
             }
         }

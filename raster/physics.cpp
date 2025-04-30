@@ -6,10 +6,10 @@ namespace raster
 
 Inertial::Inertial(
     float pos_friction, float ang_friction, const Eigen::Vector3f& velocity, const Eigen::Vector3f& angular_velocity)
-    : pos_velocity(velocity),
-      ang_velocity(angular_velocity),
-      pos_friction(pos_friction),
-      ang_friction(ang_friction)
+    : pos_friction(pos_friction),
+      ang_friction(ang_friction),
+      pos_velocity(velocity),
+      ang_velocity(angular_velocity)
 {
 }
 

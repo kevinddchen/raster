@@ -1,16 +1,20 @@
 #include <raster/app.hpp>
-#include <raster/ncurses.hpp>
 
-#include <cstdlib>
+#include <ncurses.h>
 
 
 int main()
 {
-    raster::init_ncurses();
+    // init ncurses
+    initscr();
+    cbreak();
+    noecho();
 
     raster::App app;
     app.run();
 
-    raster::end_ncurses();
+    // end ncurses
+    endwin();
+
     return EXIT_SUCCESS;
 }

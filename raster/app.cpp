@@ -1,8 +1,6 @@
 #include <raster/app.hpp>
 
-#include <raster/camera.hpp>
-#include <raster/ncurses.hpp>
-#include <raster/physics.hpp>
+#include <raster/colors.hpp>
 
 #include <Eigen/Dense>
 
@@ -50,12 +48,12 @@ App::App(int rows, int cols, double frames_per_sec) : mesh_inertial(0.99f, 0.99f
     };
 
     std::vector<short> colors = {
-        raster::COLOR_PAIR_RED,
-        raster::COLOR_PAIR_GREEN,
-        raster::COLOR_PAIR_YELLOW,
-        raster::COLOR_PAIR_BLUE,
-        raster::COLOR_PAIR_MAGENTA,
-        raster::COLOR_PAIR_MAGENTA};
+        5 * 36 + 0 * 6 + 0,   // red
+        0 * 36 + 5 * 6 + 0,   // green
+        0 * 36 + 0 * 6 + 5,   // blue
+        5 * 36 + 5 * 6 + 0,   // yellow
+        5 * 36 + 0 * 6 + 5,   // magenta
+        5 * 36 + 0 * 6 + 5};  // magenta
 
     mesh = Mesh(std::move(vertices), std::move(face_vertex_indices), std::move(colors));
 
@@ -65,6 +63,7 @@ App::App(int rows, int cols, double frames_per_sec) : mesh_inertial(0.99f, 0.99f
     camera.look_at(Eigen::Vector3f(0, 0, 0));
 
     // ncurses stuff
+    init_colors();                   // initialize colors
     curs_set(0);                     // hide cursor
     keypad(camera.window(), true);   // allow arrow keys
     nodelay(camera.window(), true);  // user input is non-blocking
