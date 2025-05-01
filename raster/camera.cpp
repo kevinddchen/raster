@@ -1,9 +1,9 @@
 #include <raster/camera.hpp>
+#include <raster/colors.hpp>
 
 #include <algorithm>
 
 #include <cmath>
-#include "raster/colors.hpp"
 
 
 namespace
@@ -178,7 +178,10 @@ void Camera::render(const Mesh& mesh) const
         // get bounding box
         const BoundingBox bbox = get_bounding_box(pix1, pix2, pix3, intrinsics.height, intrinsics.width);
 
-        // select color
+        // divide vertex colors by z-coordinate
+        const Eigen::Vector3f corrected_c1 = face.c1 / v1.z();
+        const Eigen::Vector3f corrected_c2 = face.c2 / v2.z();
+        const Eigen::Vector3f corrected_c3 = face.c3 / v3.z();
 
         // rasterize mesh face
         for (int row = bbox.min_row; row <= bbox.max_row; ++row) {
@@ -203,7 +206,7 @@ void Camera::render(const Mesh& mesh) const
                 z_buf(row, col) = z;
 
                 // compute color for the pixel using perspective-correct interpolation
-                const Eigen::Vector3f c = z * (face.c1 * b1 / v1.z() + face.c2 * b2 / v2.z() + face.c3 * b3 / v3.z());
+                const Eigen::Vector3f c = z * (corrected_c1 * b1 + corrected_c2 * b2 + corrected_c3 * b3);
                 const short color_pair = rgb_to_color_pair(c);
 
                 // draw pixel

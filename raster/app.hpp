@@ -18,7 +18,7 @@ public:
      * @param cols Number of columns.
      * @param frames_per_sec Number of frames to render per second.
      */
-    App(int rows = 50, int cols = 50, double frames_per_sec = 30.0);
+    App(int rows, int cols, double frames_per_sec = 30.0);
 
     /**
      * Run the application.
