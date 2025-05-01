@@ -3,7 +3,6 @@
 #include <Eigen/Dense>
 
 #include <iterator>
-#include <optional>
 #include <vector>
 
 
@@ -20,8 +19,12 @@ struct Face {
     const Eigen::Vector3f& v2;
     // Third vertex, as 3D point in world coordiantes.
     const Eigen::Vector3f& v3;
-    // ncurses color pair.
-    const short color;
+    // Color of first vertex, as RGB value normalized to [0, 1].
+    const Eigen::Vector3f& c1;
+    // Color of second vertex, as RGB value normalized to [0, 1].
+    const Eigen::Vector3f& c2;
+    // Color of third vertex, as RGB value normalized to [0, 1].
+    const Eigen::Vector3f& c3;
 };
 
 /**
@@ -36,15 +39,13 @@ public:
      * Create a mesh.
      *
      * @param vertices List of vertices, as 3D points in world coordinates.
-     * @param face_vertex_indices List of faces, represented as triples of integer indices corresponding to elements of
-     *     `vertices`.
-     * @param colors (Optional) List of color pair indices. If provided, must be the same length as `faces`. If not
-     *     provided, will default to all faces being white.
+     * @param face_vertex_indices List of faces, represented as triples of integer indices of `vertices`.
+     * @param vertect_colors List of vertex colors, as RGB values normalized to [0, 1]. Same length as `vertices`.
      */
     Mesh(
         std::vector<Eigen::Vector3f>&& vertices,
         std::vector<Eigen::Array3i>&& face_vertex_indices,
-        std::optional<std::vector<short>>&& colors = std::nullopt);
+        std::vector<Eigen::Vector3f>&& vertex_colors);
 
     // NOTE: copy constructors are deleted to prevent expensive copies
     Mesh(const Mesh&) = delete;
@@ -106,7 +107,7 @@ public:
 private:
     std::vector<Eigen::Vector3f> vertices;
     std::vector<Eigen::Array3i> face_vertex_indices;
-    std::vector<short> colors;
+    std::vector<Eigen::Vector3f> vertex_colors;
 };
 
 }  // namespace raster

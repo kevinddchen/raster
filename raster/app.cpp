@@ -47,15 +47,15 @@ App::App(int rows, int cols, double frames_per_sec) : mesh_kinetics(0.99f, 0.99f
         Eigen::Array3i{1, 4, 3},
     };
 
-    std::vector<short> colors = {
-        5 * 36 + 0 * 6 + 0,   // red
-        0 * 36 + 5 * 6 + 0,   // green
-        0 * 36 + 0 * 6 + 5,   // blue
-        5 * 36 + 5 * 6 + 0,   // yellow
-        5 * 36 + 0 * 6 + 5,   // magenta
-        5 * 36 + 0 * 6 + 5};  // magenta
+    std::vector<Eigen::Vector3f> vertex_colors = {
+        Eigen::Vector3f{1.0, 0.0, 0.0},  // red
+        Eigen::Vector3f{0.0, 1.0, 0.0},  // green
+        Eigen::Vector3f{0.0, 0.0, 1.0},  // blue
+        Eigen::Vector3f{1.0, 1.0, 0.0},  // yellow
+        Eigen::Vector3f{1.0, 0.0, 1.0},  // magenta
+    };
 
-    mesh = Mesh(std::move(vertices), std::move(face_vertex_indices), std::move(colors));
+    mesh = Mesh(std::move(vertices), std::move(face_vertex_indices), std::move(vertex_colors));
 
     // create a camera away from origin looking at the triangle
     camera = Camera(rows, cols, std::numbers::pi / 2);
@@ -97,28 +97,28 @@ void App::run()
 
 bool App::handle_keystroke(int key)
 {
-    Eigen::Vector3f delta_angular_velocity = Eigen::Vector3f::Zero();
+    Eigen::Vector3f delta_ang_velocity = Eigen::Vector3f::Zero();
 
     // handle keystroke
     switch (key) {
         case 'a':
         case KEY_LEFT: {
-            delta_angular_velocity = {0, 0, -ANGULAR_ACCELERATION};
+            delta_ang_velocity = {0, 0, -ANGULAR_ACCELERATION};
             break;
         }
         case 's':
         case KEY_DOWN: {
-            delta_angular_velocity = {0, ANGULAR_ACCELERATION, 0};
+            delta_ang_velocity = {0, ANGULAR_ACCELERATION, 0};
             break;
         }
         case 'w':
         case KEY_UP: {
-            delta_angular_velocity = {0, -ANGULAR_ACCELERATION, 0};
+            delta_ang_velocity = {0, -ANGULAR_ACCELERATION, 0};
             break;
         }
         case 'd':
         case KEY_RIGHT: {
-            delta_angular_velocity = {0, 0, ANGULAR_ACCELERATION};
+            delta_ang_velocity = {0, 0, ANGULAR_ACCELERATION};
             break;
         }
         case 'r':  // refresh
@@ -131,7 +131,7 @@ bool App::handle_keystroke(int key)
     }
 
     // update mesh
-    const Eigen::Affine3f delta_pose = mesh_inertial.update(Eigen::Vector3f::Zero(), delta_angular_velocity);
+    const Eigen::Affine3f delta_pose = mesh_kinetics.update(Eigen::Vector3f::Zero(), delta_ang_velocity);
     mesh.transform(delta_pose);
 
     return true;

@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include <cmath>
+#include "raster/colors.hpp"
 
 
 namespace
@@ -178,30 +179,40 @@ void Camera::render(const Mesh& mesh) const
         const BoundingBox bbox = get_bounding_box(pix1, pix2, pix3, intrinsics.height, intrinsics.width);
 
         // select color
-        const chtype attr = COLOR_PAIR(face.color);
-        wattron(_window, attr);
 
         // rasterize mesh face
         for (int row = bbox.min_row; row <= bbox.max_row; ++row) {
             for (int col = bbox.min_col; col <= bbox.max_col; ++col) {
-                // get image plane coordinates for the pixel
+                // get coords of the pixel
                 const Eigen::Vector2f pixq{col, row};
-                float b1, b2, b3;
+
+                // check that pixel is interior to the triangle or on an edge
+                float b1, b2, b3;  // barycentric coords
                 if (!point_in_triangle(pixq, pix1, pix2, pix3, b1, b2, b3)) {
                     continue;
                 }
-                // compute z for the corresponding point on the triangle in camera space. recall that due to projection,
-                // the value of 1/z is linearly interpolated in the image plane by barycentric coords
+
+                // compute z for the pixel using perspective-correct interpolation
+                const float& prev_z = z_buf(row, col);
                 const float z = 1 / (b1 / v1.z() + b2 / v2.z() + b3 / v3.z());
-                if (const float prev_z = z_buf(row, col); prev_z < 0 || z < prev_z) {
-                    // update z-buffer and render pixel
-                    z_buf(row, col) = z;
-                    mvwaddch(_window, row, col, ' ');
+                if (prev_z > 0 && z >= prev_z) {
+                    continue;
                 }
+
+                // update z-buffer and render pixel
+                z_buf(row, col) = z;
+
+                // compute color for the pixel using perspective-correct interpolation
+                const Eigen::Vector3f c = z * (face.c1 * b1 / v1.z() + face.c2 * b2 / v2.z() + face.c3 * b3 / v3.z());
+                const short color_pair = rgb_to_color_pair(c);
+
+                // draw pixel
+                const chtype attr = COLOR_PAIR(color_pair);
+                wattron(_window, attr);
+                mvwaddch(_window, row, col, ' ');
+                wattroff(_window, attr);
             }
         }
-
-        wattroff(_window, attr);
     }
 
     wnoutrefresh(_window);
