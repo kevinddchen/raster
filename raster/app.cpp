@@ -25,7 +25,7 @@ std::chrono::steady_clock::time_point now()
 namespace raster
 {
 
-App::App(int rows, int cols, double frames_per_sec) : mesh_inertial(0.99f, 0.99f), frames_per_sec(frames_per_sec)
+App::App(int rows, int cols, double frames_per_sec) : mesh_kinetics(0.99f, 0.99f), frames_per_sec(frames_per_sec)
 {
     // NOTE: world "up" is the +z axis
 

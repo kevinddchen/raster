@@ -35,7 +35,7 @@ private:
     bool handle_keystroke(int key);
 
     Mesh mesh;
-    Inertial mesh_inertial;
+    Kinetics mesh_kinetics;
     Camera camera;
 
     const double frames_per_sec;

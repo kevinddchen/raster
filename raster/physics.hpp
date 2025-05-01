@@ -7,20 +7,20 @@ namespace raster
 {
 
 /**
- * Representation of a physical object's rigid motion.
+ * Representation of a physical object's motion.
  */
-class Inertial
+class Kinetics
 {
 public:
     /**
-     * Create new `Inertial`.
+     * Create new `Kinetics`.
      *
      * @param pos_friction Friction for positional velocity. 1.0 means no friction.
      * @param ang_friction Friction for angular velocity. 1.0 means no friction.
      * @param init_pos_velocity Initial positional velocity.
      * @param init_ang_velocity Initial angular velocity.
      */
-    Inertial(
+    Kinetics(
         float pos_friction = 1.f,
         float ang_friction = 1.f,
         const Eigen::Vector3f& init_pos_velocity = Eigen::Vector3f::Zero(),
@@ -31,12 +31,13 @@ public:
      * velocities. Can also be provided updates to the positional and angular velocities themselves, which will affect
      * the object's motion in future steps.
      *
-     * @param delta_velocity If not null, will update the object's velocity AFTER the pose correction is returned.
-     * @param delta_angular_velocity If not null, will update the object's angular velocity AFTER the pose correction is
-     *     returned.
+     * @param delta_pos_velocity Added to the object's velocity AFTER the pose correction is returned.
+     * @param delta_ang_velocity Added to the object's angular velocity AFTER the pose correction is returned.
      * @returns A pose correction as an affine (i.e. rigid) transformation.
      */
-    Eigen::Affine3f update(const Eigen::Vector3f& delta_velocity, const Eigen::Vector3f& delta_angular_velocity);
+    Eigen::Affine3f update(
+        const Eigen::Vector3f& delta_pos_velocity = Eigen::Vector3f::Zero(),
+        const Eigen::Vector3f& delta_ang_velocity = Eigen::Vector3f::Zero());
 
 private:
     const float pos_friction;
