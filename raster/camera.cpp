@@ -21,7 +21,8 @@ bool project_point(const Eigen::Vector3f& v, Eigen::Vector2f& p)
     if (v.z() <= 0) {
         return false;
     }
-    p = {v.x() / v.z(), v.y() / v.z()};
+    p.x() = v.x() / v.z();
+    p.y() = v.y() / v.z();
     return true;
 }
 

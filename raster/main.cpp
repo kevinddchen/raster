@@ -10,7 +10,7 @@ int main()
     cbreak();
     noecho();
 
-    raster::App app(100, 100);
+    raster::App app(128, 128);
     app.run();
 
     // end ncurses
