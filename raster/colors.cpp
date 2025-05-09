@@ -10,8 +10,9 @@ namespace
 
 // Number of color levels
 constexpr int NUM_LEVELS = 6;
-// Color levels
-constexpr std::array<short, NUM_LEVELS> LEVELS = {0, 200, 400, 600, 800, 1000};
+// Color levels. We do not use equally-spaced levels; we follow a sqrt distribution so that we have more colors with
+// high brightness.
+constexpr std::array<short, NUM_LEVELS> LEVELS = {0, 447, 632, 775, 894, 1000};
 
 // Offset to avoid overwriting ncurses default colors
 constexpr short COLOR_ENCODING_OFFSET = 8;
@@ -23,7 +24,8 @@ constexpr short PAIR_ENCODING_OFFSET = 1;
  */
 int color_to_level(float color)
 {
-    return std::clamp(static_cast<int>(std::floor(color * NUM_LEVELS)), 0, NUM_LEVELS - 1);
+    // NOTE: because our color levels follow a sqrt distribution, we need to square first
+    return std::clamp(static_cast<int>(std::floor(color * color * NUM_LEVELS)), 0, NUM_LEVELS - 1);
 }
 
 /**
