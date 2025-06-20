@@ -1,32 +1,53 @@
 #include <raster/mesh.hpp>
 
+#include <raster/io.hpp>
+
 
 namespace raster
 {
 
 Mesh::Mesh(
     std::vector<Eigen::Vector3f>&& vertices,
-    std::vector<Eigen::Array3i>&& face_vertex_indices,
-    std::vector<Eigen::Vector3f>&& vertex_colors)
+    std::vector<Eigen::Array3f>&& vertex_colors,
+    std::vector<Eigen::Array3i>&& face_vertex_indices)
     : vertices(vertices),
-      face_vertex_indices(face_vertex_indices),
-      vertex_colors(vertex_colors)
+      vertex_colors(vertex_colors),
+      face_vertex_indices(face_vertex_indices)
 {
     assert(vertices.size() == vertex_colors.size());
 }
 
+Mesh::Mesh(const char* obj)
+{
+    const std::vector<std::string> lines = io::read_lines(obj);
+    for (const auto& line : lines) {
+        const std::vector<std::string> parts = io::split(line, " ");
+        if (parts.size() == 0) {
+            continue;
+        }
+        if (parts[0] == "v") {
+            assert(parts.size() >= 7);
+            vertices.emplace_back(std::stof(parts[1]), std::stof(parts[2]), std::stof(parts[3]));
+            vertex_colors.emplace_back(std::stof(parts[4]), std::stof(parts[5]), std::stof(parts[6]));
+        } else if (parts[0] == "f") {
+            assert(parts.size() >= 4);
+            face_vertex_indices.emplace_back(std::stoi(parts[1]), std::stoi(parts[2]), std::stoi(parts[3]));
+        }
+    }
+}
+
 Mesh::Mesh(Mesh&& other)
     : vertices(std::move(other.vertices)),
-      face_vertex_indices(std::move(other.face_vertex_indices)),
-      vertex_colors(std::move(other.vertex_colors))
+      vertex_colors(std::move(other.vertex_colors)),
+      face_vertex_indices(std::move(other.face_vertex_indices))
 {
 }
 
 Mesh& Mesh::operator=(Mesh&& other)
 {
     vertices = std::move(other.vertices);
-    face_vertex_indices = std::move(other.face_vertex_indices);
     vertex_colors = std::move(other.vertex_colors);
+    face_vertex_indices = std::move(other.face_vertex_indices);
     return *this;
 }
 

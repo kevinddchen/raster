@@ -180,9 +180,9 @@ void Camera::render(const Mesh& mesh) const
         const BoundingBox bbox = get_bounding_box(pix1, pix2, pix3, intrinsics.height, intrinsics.width);
 
         // divide vertex colors by z-coordinate
-        const Eigen::Vector3f corrected_c1 = srgb_to_linear(face.c1) / v1.z();
-        const Eigen::Vector3f corrected_c2 = srgb_to_linear(face.c2) / v2.z();
-        const Eigen::Vector3f corrected_c3 = srgb_to_linear(face.c3) / v3.z();
+        const Eigen::Array3f corrected_c1 = srgb_to_linear(face.c1) / v1.z();
+        const Eigen::Array3f corrected_c2 = srgb_to_linear(face.c2) / v2.z();
+        const Eigen::Array3f corrected_c3 = srgb_to_linear(face.c3) / v3.z();
 
         // rasterize mesh face
         for (int row = bbox.min_row; row <= bbox.max_row; ++row) {
@@ -207,7 +207,7 @@ void Camera::render(const Mesh& mesh) const
                 z_buf(row, col) = z;
 
                 // compute color for the pixel using perspective-correct interpolation
-                const Eigen::Vector3f c =
+                const Eigen::Array3f c =
                     linear_to_srgb(z * (corrected_c1 * b1 + corrected_c2 * b2 + corrected_c3 * b3));
                 const short color_pair = rgb_to_color_pair(c);
 

@@ -16,7 +16,6 @@ Kinetics::Kinetics(
 {
 }
 
-
 Eigen::Affine3f Kinetics::update(const Eigen::Vector3f& delta_pos_velocity, const Eigen::Vector3f& delta_ang_velocity)
 {
     const float ang_vel_angle = ang_velocity.norm();

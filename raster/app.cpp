@@ -6,7 +6,6 @@
 
 #include <numbers>
 #include <thread>
-#include <vector>
 
 
 namespace
@@ -27,35 +26,7 @@ namespace raster
 
 App::App(int rows, int cols, double frames_per_sec) : mesh_kinetics(0.99f, 0.99f), frames_per_sec(frames_per_sec)
 {
-    // NOTE: world "up" is the +z axis
-
-    // create a pyramid
-    std::vector<Eigen::Vector3f> vertices = {
-        Eigen::Vector3f{0.0, 0.0, 0.8},
-        Eigen::Vector3f{0.5, 0.0, -0.4},
-        Eigen::Vector3f{0.0, 0.5, -0.4},
-        Eigen::Vector3f{-0.5, 0.0, -0.4},
-        Eigen::Vector3f{0.0, -0.5, -0.4},
-    };
-
-    std::vector<Eigen::Array3i> face_vertex_indices = {
-        Eigen::Array3i{0, 1, 2},
-        Eigen::Array3i{0, 2, 3},
-        Eigen::Array3i{0, 3, 4},
-        Eigen::Array3i{0, 4, 1},
-        Eigen::Array3i{1, 3, 2},
-        Eigen::Array3i{1, 4, 3},
-    };
-
-    std::vector<Eigen::Vector3f> vertex_colors = {
-        Eigen::Vector3f{1.0, 0.0, 0.0},  // red
-        Eigen::Vector3f{0.0, 1.0, 0.0},  // green
-        Eigen::Vector3f{0.0, 0.0, 1.0},  // blue
-        Eigen::Vector3f{1.0, 1.0, 0.0},  // yellow
-        Eigen::Vector3f{1.0, 0.0, 1.0},  // magenta
-    };
-
-    mesh = Mesh(std::move(vertices), std::move(face_vertex_indices), std::move(vertex_colors));
+    mesh = Mesh("data/cube.obj");
 
     // create a camera away from origin looking at the triangle
     camera = Camera(rows, cols, std::numbers::pi / 2);

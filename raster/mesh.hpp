@@ -20,11 +20,11 @@ struct Face {
     // Third vertex, as 3D point in world coordiantes.
     const Eigen::Vector3f& v3;
     // Color of first vertex, as RGB value normalized to [0, 1].
-    const Eigen::Vector3f& c1;
+    const Eigen::Array3f& c1;
     // Color of second vertex, as RGB value normalized to [0, 1].
-    const Eigen::Vector3f& c2;
+    const Eigen::Array3f& c2;
     // Color of third vertex, as RGB value normalized to [0, 1].
-    const Eigen::Vector3f& c3;
+    const Eigen::Array3f& c3;
 };
 
 /**
@@ -39,13 +39,20 @@ public:
      * Create a mesh.
      *
      * @param vertices List of vertices, as 3D points in world coordinates.
-     * @param face_vertex_indices List of faces, represented as triples of integer indices of `vertices`.
      * @param vertect_colors List of vertex colors, as RGB values normalized to [0, 1]. Same length as `vertices`.
+     * @param face_vertex_indices List of faces, represented as triples of integer indices of `vertices`.
      */
     Mesh(
         std::vector<Eigen::Vector3f>&& vertices,
-        std::vector<Eigen::Array3i>&& face_vertex_indices,
-        std::vector<Eigen::Vector3f>&& vertex_colors);
+        std::vector<Eigen::Array3f>&& vertex_colors,
+        std::vector<Eigen::Array3i>&& face_vertex_indices);
+
+    /**
+     * Load mesh from .obj file.
+     *
+     * @param obj Path to file.
+     */
+    Mesh(const char* obj);
 
     // NOTE: copy constructors are deleted to prevent expensive copies
     Mesh(const Mesh&) = delete;
@@ -106,8 +113,8 @@ public:
 
 private:
     std::vector<Eigen::Vector3f> vertices;
+    std::vector<Eigen::Array3f> vertex_colors;
     std::vector<Eigen::Array3i> face_vertex_indices;
-    std::vector<Eigen::Vector3f> vertex_colors;
 };
 
 }  // namespace raster

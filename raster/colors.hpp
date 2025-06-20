@@ -18,16 +18,16 @@ void init_colors();
 /**
  * Convert RGB value normalized to [0, 1] to the closest ncurses color pair.
  */
-short rgb_to_color_pair(const Eigen::Vector3f& color);
+short rgb_to_color_pair(const Eigen::Array3f& color);
 
 /**
  * Convert from sRGB color space to linear color space.
  */
-Eigen::Vector3f srgb_to_linear(const Eigen::Vector3f& srgb);
+Eigen::Array3f srgb_to_linear(const Eigen::Array3f& srgb);
 
 /**
  * Convert from linear color space to sRGB color space.
  */
-Eigen::Vector3f linear_to_srgb(const Eigen::Vector3f& linear);
+Eigen::Array3f linear_to_srgb(const Eigen::Array3f& linear);
 
 }  // namespace raster

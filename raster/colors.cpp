@@ -76,7 +76,7 @@ void init_colors()
     }
 }
 
-short rgb_to_color_pair(const Eigen::Vector3f& color)
+short rgb_to_color_pair(const Eigen::Array3f& color)
 {
     const int r = color_to_level(color(0));
     const int g = color_to_level(color(1));
@@ -84,12 +84,12 @@ short rgb_to_color_pair(const Eigen::Vector3f& color)
     return (r * NUM_LEVELS + g) * NUM_LEVELS + b + PAIR_ENCODING_OFFSET;
 }
 
-Eigen::Vector3f srgb_to_linear(const Eigen::Vector3f& srgb)
+Eigen::Array3f srgb_to_linear(const Eigen::Array3f& srgb)
 {
     return {::srgb_to_linear(srgb(0)), ::srgb_to_linear(srgb(1)), ::srgb_to_linear(srgb(2))};
 }
 
-Eigen::Vector3f linear_to_srgb(const Eigen::Vector3f& linear)
+Eigen::Array3f linear_to_srgb(const Eigen::Array3f& linear)
 {
     return {::linear_to_srgb(linear(0)), ::linear_to_srgb(linear(1)), ::linear_to_srgb(linear(2))};
 }
