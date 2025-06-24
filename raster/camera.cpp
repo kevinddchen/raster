@@ -1,4 +1,5 @@
 #include <raster/camera.hpp>
+
 #include <raster/colors.hpp>
 
 #include <algorithm>
@@ -252,6 +253,12 @@ void Camera::look_at(const Eigen::Vector3f& look_at_point, const Eigen::Vector3f
 
     camera_to_world.linear() = rotation;
     world_to_camera = camera_to_world.inverse();
+}
+
+void Camera::set_pose(const Eigen::Affine3f& camera_to_world)
+{
+    this->camera_to_world = camera_to_world;
+    this->world_to_camera = camera_to_world.inverse();
 }
 
 Eigen::Vector2f Camera::image_plane_to_pixel(const Eigen::Vector2f& p, const Intrinsics& intrinsics)

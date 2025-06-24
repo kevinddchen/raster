@@ -23,8 +23,6 @@ namespace raster
 class Camera
 {
 public:
-    Camera() = default;
-
     /**
      * Create new perspective camera.
      *
@@ -64,6 +62,13 @@ public:
      * @param world_up Vector pointing in the "up" direction, in world coordinates.
      */
     void look_at(const Eigen::Vector3f& look_at_point, const Eigen::Vector3f& world_up = Eigen::Vector3f::UnitZ());
+
+    /**
+     * Set the camera-to-world pose of the camera.
+     *
+     * @param camera_to_world The camera-to-world pose.
+     */
+    void set_pose(const Eigen::Affine3f& camera_to_world);
 
     inline WINDOW* window() const { return _window; }
 

@@ -24,13 +24,15 @@ std::chrono::steady_clock::time_point now()
 namespace raster
 {
 
-App::App(int rows, int cols, double frames_per_sec) : mesh_kinetics(0.99f, 0.99f), frames_per_sec(frames_per_sec)
+App::App(int rows, int cols, double frames_per_sec)
+    : mesh_kinetics(0.99f, 0.99f),
+      camera(rows, cols, std::numbers::pi / 2),
+      frames_per_sec(frames_per_sec)
 {
     mesh = Mesh("data/cube.obj");
 
-    // create a camera away from origin looking at the triangle
-    camera = Camera(rows, cols, std::numbers::pi / 2);
-    camera.transform(Eigen::Affine3f(Eigen::Translation3f(1, 0, 0)));
+    // set camera away from origin looking at the triangle
+    camera.set_pose(Eigen::Affine3f(Eigen::Translation3f(1, 0, 0)));
     camera.look_at(Eigen::Vector3f(0, 0, 0));
 
     // ncurses stuff
