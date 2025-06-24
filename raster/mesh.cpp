@@ -31,7 +31,7 @@ Mesh::Mesh(const char* obj)
             vertex_colors.emplace_back(std::stof(parts[4]), std::stof(parts[5]), std::stof(parts[6]));
         } else if (parts[0] == "f") {
             assert(parts.size() >= 4);
-            face_vertex_indices.emplace_back(std::stoi(parts[1]), std::stoi(parts[2]), std::stoi(parts[3]));
+            face_vertex_indices.emplace_back(std::stoi(parts[1]) - 1, std::stoi(parts[2]) - 1, std::stoi(parts[3]) - 1);
         }
     }
 }

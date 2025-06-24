@@ -32,7 +32,7 @@ App::App(int rows, int cols, double frames_per_sec)
     mesh = Mesh("data/cube.obj");
 
     // set camera away from origin looking at the triangle
-    camera.set_pose(Eigen::Affine3f(Eigen::Translation3f(1, 0, 0)));
+    camera.set_pose(Eigen::Affine3f(Eigen::Translation3f(2, 0, 0)));
     camera.look_at(Eigen::Vector3f(0, 0, 0));
 
     // ncurses stuff
